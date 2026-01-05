@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Track Your Sample Request</h1>
+            <p class="lead mb-4">Enter your email address or tracking number to check the status of your sample request.</p>
+
+            <form action="/samples/track" method="POST" class="card mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="Enter the email you used for the sample request">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">OR</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="trackingNumber" class="form-label">Tracking Number</label>
+                        <input type="text" class="form-control" id="trackingNumber" name="trackingNumber" 
+                               placeholder="Enter your tracking number">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Track Sample</button>
+                </div>
+            </form>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <% if (sampleRequest) { %>
+            <div class="tracking-card">
+                <h3 class="mb-4">Sample Request Status</h3>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Product:</strong> <%= sampleRequest.productName %></p>
+                        <p><strong>Quantity:</strong> <%= sampleRequest.quantity %></p>
+                        <% if (sampleRequest.size) { %>
+                        <p><strong>Size:</strong> <%= sampleRequest.size %></p>
+                        <% } %>
+                        <% if (sampleRequest.color) { %>
+                        <p><strong>Color:</strong> <%= sampleRequest.color %></p>
+                        <% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            <span class="badge badge-status-<%= sampleRequest.status.toLowerCase().replace(' ', '-') %>">
+                                <%= sampleRequest.status %>
+                            </span>
+                        </p>
+                        <p><strong>Requested On:</strong> <%= new Date(sampleRequest.requestedAt).toLocaleDateString() %></p>
+                        <% if (sampleRequest.trackingNumber) { %>
+                        <p><strong>Tracking Number:</strong> <code><%= sampleRequest.trackingNumber %></code></p>
+                        <% } %>
+                        <% if (sampleRequest.dispatchedAt) { %>
+                        <p><strong>Dispatched On:</strong> <%= new Date(sampleRequest.dispatchedAt).toLocaleDateString() %></p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <% if (sampleRequest.shippingAddress) { %>
+                <div class="mb-4">
+                    <h5>Shipping Address</h5>
+                    <p class="mb-0">
+                        <%= sampleRequest.shippingAddress.street %><br>
+                        <%= sampleRequest.shippingAddress.city %>, 
+                        <%= sampleRequest.shippingAddress.state %> 
+                        <%= sampleRequest.shippingAddress.zipCode %><br>
+                        <%= sampleRequest.shippingAddress.country %>
+                    </p>
+                </div>
+                <% } %>
+
+                <div class="tracking-timeline">
+                    <div class="tracking-step <%= sampleRequest.status === 'Requested' || sampleRequest.status === 'In Progress' || sampleRequest.status === 'Dispatched' || sampleRequest.status === 'Delivered' ? 'completed' : '' %>">
+                        <h6>Requested</h6>
+                        <p class="text-muted mb-0">Your sample request has been received</p>
+                    </div>
+                    <div class="tracking-step <%= sampleRequest.status === 'In Progress' || sampleRequest.status === 'Dispatched' || sampleRequest.status === 'Delivered' ? 'completed' : (sampleRequest.status === 'Requested' ? 'active' : '') %>">
+                        <h6>In Progress</h6>
+                        <p class="text-muted mb-0">Your sample is being prepared</p>
+                    </div>
+                    <div class="tracking-step <%= sampleRequest.status === 'Dispatched' || sampleRequest.status === 'Delivered' ? 'completed' : (sampleRequest.status === 'In Progress' ? 'active' : '') %>">
+                        <h6>Dispatched</h6>
+                        <p class="text-muted mb-0">Your sample has been shipped</p>
+                    </div>
+                    <div class="tracking-step <%= sampleRequest.status === 'Delivered' ? 'completed' : (sampleRequest.status === 'Dispatched' ? 'active' : '') %>">
+                        <h6>Delivered</h6>
+                        <p class="text-muted mb-0">Your sample has been delivered</p>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+

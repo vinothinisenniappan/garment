@@ -1,0 +1,125 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Sample Requests</h1>
+                <a href="/admin/dashboard" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger">
+        <%= error %>
+    </div>
+    <% } %>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <% if (samples && samples.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Buyer</th>
+                                    <th>Email</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Tracking #</th>
+                                    <th>Requested</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% samples.forEach(sample => { %>
+                                <tr>
+                                    <td>
+                                        <%= sample.productId ? sample.productId.name : sample.productName %>
+                                        <br><small class="text-muted"><%= sample.productId ? sample.productId.category : '' %></small>
+                                    </td>
+                                    <td><%= sample.buyerId ? sample.buyerId.companyName : sample.buyerName %></td>
+                                    <td><%= sample.buyerEmail %></td>
+                                    <td><%= sample.quantity %></td>
+                                    <td>
+                                        <span class="badge badge-status-<%= sample.status.toLowerCase().replace(' ', '-') %>">
+                                            <%= sample.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if (sample.trackingNumber) { %>
+                                        <code><%= sample.trackingNumber %></code>
+                                        <% } else { %>
+                                        <span class="text-muted">-</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(sample.requestedAt).toLocaleDateString() %></td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#sampleModal<%= sample._id %>">
+                                            <i class="bi bi-pencil"></i> Update
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Update Modal -->
+                                <div class="modal fade" id="sampleModal<%= sample._id %>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Update Sample Request</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form class="status-update-form" data-sample-id="<%= sample._id %>">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="status<%= sample._id %>" class="form-label">Status</label>
+                                                        <select class="form-select" id="status<%= sample._id %>" name="status" required>
+                                                            <option value="Requested" <%= sample.status === 'Requested' ? 'selected' : '' %>>Requested</option>
+                                                            <option value="In Progress" <%= sample.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                                                            <option value="Dispatched" <%= sample.status === 'Dispatched' ? 'selected' : '' %>>Dispatched</option>
+                                                            <option value="Delivered" <%= sample.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="trackingNumber<%= sample._id %>" class="form-label">Tracking Number</label>
+                                                        <input type="text" class="form-control" id="trackingNumber<%= sample._id %>" 
+                                                               name="trackingNumber" value="<%= sample.trackingNumber || '' %>"
+                                                               placeholder="Enter tracking number">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="notes<%= sample._id %>" class="form-label">Notes</label>
+                                                        <textarea class="form-control" id="notes<%= sample._id %>" name="notes" rows="3"><%= sample.notes || '' %></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Update Status</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } else { %>
+                    <div class="alert alert-info">
+                        <h5>No sample requests found</h5>
+                        <p>Sample requests will appear here once submitted by buyers.</p>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+

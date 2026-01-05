@@ -1,0 +1,99 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Manage Products</h1>
+                <div>
+                    <a href="/admin/dashboard" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="/admin/products/add" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add New Product
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger">
+        <%= error %>
+    </div>
+    <% } %>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <% if (products && products.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Fabric Type</th>
+                                    <th>GSM</th>
+                                    <th>Size Range</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% products.forEach(product => { %>
+                                <tr>
+                                    <td>
+                                        <% if (product.images && product.images.length > 0) { %>
+                                        <img src="<%= product.images[0] %>" alt="<%= product.name %>" 
+                                             style="width: 60px; height: 60px; object-fit: cover;" 
+                                             onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'">
+                                        <% } else { %>
+                                        <img src="https://via.placeholder.com/60x60?text=No+Image" alt="No image">
+                                        <% } %>
+                                    </td>
+                                    <td><%= product.name %></td>
+                                    <td><span class="badge bg-secondary"><%= product.category %></span></td>
+                                    <td><%= product.fabricType %></td>
+                                    <td><%= product.gsm %></td>
+                                    <td><%= product.sizeRange %></td>
+                                    <td>
+                                        <% if (product.isActive) { %>
+                                        <span class="badge bg-success">Active</span>
+                                        <% } else { %>
+                                        <span class="badge bg-secondary">Inactive</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="/products/<%= product._id %>" class="btn btn-sm btn-info" target="_blank">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/admin/products/edit/<%= product._id %>" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-delete-product="<%= product._id %>">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } else { %>
+                    <div class="alert alert-info">
+                        <h5>No products found</h5>
+                        <p>Get started by adding your first product.</p>
+                        <a href="/admin/products/add" class="btn btn-primary">Add Product</a>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+

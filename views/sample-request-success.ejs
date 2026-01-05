@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card text-center">
+                <div class="card-body py-5">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    <h1 class="mt-4 mb-3">Sample Request Submitted!</h1>
+                    <p class="lead mb-4"><%= typeof message !== 'undefined' ? message : 'Your sample request has been received!' %></p>
+                    
+                    <% if (sampleRequest) { %>
+                    <div class="card bg-light mb-4 text-start">
+                        <div class="card-body">
+                            <h5 class="card-title">Request Details</h5>
+                            <p><strong>Product:</strong> <%= sampleRequest.productName %></p>
+                            <p><strong>Quantity:</strong> <%= sampleRequest.quantity %></p>
+                            <p><strong>Status:</strong> <span class="badge badge-status-<%= sampleRequest.status.toLowerCase().replace(' ', '-') %>"><%= sampleRequest.status %></span></p>
+                            <p><strong>Requested On:</strong> <%= new Date(sampleRequest.requestedAt).toLocaleDateString() %></p>
+                        </div>
+                    </div>
+                    <% } %>
+
+                    <p class="text-muted mb-4">You will receive a confirmation email shortly. You can track your sample request status using your email address.</p>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="/samples/track" class="btn btn-primary btn-lg">Track Sample</a>
+                        <a href="/products" class="btn btn-outline-primary btn-lg">Browse More Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+

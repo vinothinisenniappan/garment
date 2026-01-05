@@ -1,0 +1,166 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Buyer Details</h1>
+                <a href="/admin/buyers" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Buyers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Company Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Company Name:</strong><br>
+                            <%= buyer.companyName %>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Contact Person:</strong><br>
+                            <%= buyer.contactPerson %>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Email:</strong><br>
+                            <a href="mailto:<%= buyer.email %>"><%= buyer.email %></a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Phone:</strong><br>
+                            <a href="tel:<%= buyer.phone %>"><%= buyer.phone %></a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Country:</strong><br>
+                            <%= buyer.country %>
+                        </div>
+                        <% if (buyer.website) { %>
+                        <div class="col-md-6 mb-3">
+                            <strong>Website:</strong><br>
+                            <a href="<%= buyer.website %>" target="_blank"><%= buyer.website %></a>
+                        </div>
+                        <% } %>
+                        <% if (buyer.address) { %>
+                        <div class="col-12 mb-3">
+                            <strong>Address:</strong><br>
+                            <%= buyer.address %>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Business Details</h5>
+                </div>
+                <div class="card-body">
+                    <% if (buyer.businessType) { %>
+                    <div class="mb-3">
+                        <strong>Business Type:</strong><br>
+                        <%= buyer.businessType %>
+                    </div>
+                    <% } %>
+                    <% if (buyer.annualVolume) { %>
+                    <div class="mb-3">
+                        <strong>Annual Volume:</strong><br>
+                        <%= buyer.annualVolume %>
+                    </div>
+                    <% } %>
+                    <% if (buyer.preferredCategories && buyer.preferredCategories.length > 0) { %>
+                    <div class="mb-3">
+                        <strong>Preferred Categories:</strong><br>
+                        <% buyer.preferredCategories.forEach(cat => { %>
+                        <span class="badge bg-secondary me-1"><%= cat %></span>
+                        <% }); %>
+                    </div>
+                    <% } %>
+                    <% if (buyer.requirements) { %>
+                    <div class="mb-3">
+                        <strong>Requirements:</strong><br>
+                        <%= buyer.requirements %>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <% if (sampleRequests && sampleRequests.length > 0) { %>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sample Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Requested</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% sampleRequests.forEach(sample => { %>
+                                <tr>
+                                    <td><%= sample.productId ? sample.productId.name : 'N/A' %></td>
+                                    <td><%= sample.quantity %></td>
+                                    <td><span class="badge badge-status-<%= sample.status.toLowerCase().replace(' ', '-') %>"><%= sample.status %></span></td>
+                                    <td><%= new Date(sample.requestedAt).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/admin/samples" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Update Status</h5>
+                </div>
+                <div class="card-body">
+                    <form class="buyer-status-form" data-buyer-id="<%= buyer._id %>">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="New" <%= buyer.status === 'New' ? 'selected' : '' %>>New</option>
+                                <option value="Contacted" <%= buyer.status === 'Contacted' ? 'selected' : '' %>>Contacted</option>
+                                <option value="Qualified" <%= buyer.status === 'Qualified' ? 'selected' : '' %>>Qualified</option>
+                                <option value="Rejected" <%= buyer.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4"><%= buyer.notes || '' %></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <p><strong>Submitted:</strong><br>
+                    <%= new Date(buyer.submittedAt).toLocaleString() %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+

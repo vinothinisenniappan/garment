@@ -1,0 +1,87 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <a href="/products" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Products
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <% if (product.images && product.images.length > 0) { %>
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% product.images.forEach((image, index) => { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <img src="<%= image %>" class="d-block w-100" alt="<%= product.name %>" onerror="this.src='https://via.placeholder.com/600x500?text=No+Image'">
+                    </div>
+                    <% }); %>
+                </div>
+                <% if (product.images.length > 1) { %>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                <% } %>
+            </div>
+            <% } else { %>
+            <img src="https://via.placeholder.com/600x500?text=No+Image" class="img-fluid" alt="<%= product.name %>">
+            <% } %>
+        </div>
+        
+        <div class="col-md-6">
+            <span class="badge bg-secondary mb-2"><%= product.category %></span>
+            <h1 class="mb-3"><%= product.name %></h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Product Specifications</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Fabric Type:</strong></td>
+                            <td><%= product.fabricType %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GSM:</strong></td>
+                            <td><%= product.gsm %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Size Range:</strong></td>
+                            <td><%= product.sizeRange %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category:</strong></td>
+                            <td><%= product.category %></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <% if (product.description) { %>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p><%= product.description %></p>
+                </div>
+            </div>
+            <% } %>
+
+            <div class="d-grid gap-2">
+                <a href="/samples/request?productId=<%= product._id %>" class="btn btn-primary btn-lg">
+                    <i class="bi bi-box-seam"></i> Request Sample
+                </a>
+                <a href="/inquiry" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-envelope"></i> Submit Inquiry
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+

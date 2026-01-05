@@ -1,0 +1,122 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1><%= product ? 'Edit Product' : 'Add New Product' %></h1>
+                <a href="/admin/products" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            <% errors.forEach(err => { %>
+                            <li><%= err.msg %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <% } %>
+
+                    <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                    <form action="<%= product ? '/admin/products/edit/' + product._id : '/admin/products/add' %>" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Product Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="<%= product ? product.name : (typeof formData !== 'undefined' && formData.name ? formData.name : '') %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category *</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select category...</option>
+                                <option value="T-shirts" <%= (product && product.category === 'T-shirts') || (typeof formData !== 'undefined' && formData.category === 'T-shirts') ? 'selected' : '' %>>T-shirts</option>
+                                <option value="Gents Wear" <%= (product && product.category === 'Gents Wear') || (typeof formData !== 'undefined' && formData.category === 'Gents Wear') ? 'selected' : '' %>>Gents Wear</option>
+                                <option value="Ladies Wear" <%= (product && product.category === 'Ladies Wear') || (typeof formData !== 'undefined' && formData.category === 'Ladies Wear') ? 'selected' : '' %>>Ladies Wear</option>
+                                <option value="Kids Wear" <%= (product && product.category === 'Kids Wear') || (typeof formData !== 'undefined' && formData.category === 'Kids Wear') ? 'selected' : '' %>>Kids Wear</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"><%= product ? product.description : (typeof formData !== 'undefined' && formData.description ? formData.description : '') %></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fabricType" class="form-label">Fabric Type *</label>
+                                <input type="text" class="form-control" id="fabricType" name="fabricType" 
+                                       value="<%= product ? product.fabricType : (typeof formData !== 'undefined' && formData.fabricType ? formData.fabricType : '') %>" 
+                                       placeholder="e.g., Cotton, Polyester" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gsm" class="form-label">GSM *</label>
+                                <input type="text" class="form-control" id="gsm" name="gsm" 
+                                       value="<%= product ? product.gsm : (typeof formData !== 'undefined' && formData.gsm ? formData.gsm : '') %>" 
+                                       placeholder="e.g., 180 GSM" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sizeRange" class="form-label">Size Range *</label>
+                            <input type="text" class="form-control" id="sizeRange" name="sizeRange" 
+                                   value="<%= product ? product.sizeRange : (typeof formData !== 'undefined' && formData.sizeRange ? formData.sizeRange : '') %>" 
+                                   placeholder="e.g., S, M, L, XL, XXL" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Image URLs (one per line)</label>
+                            <textarea class="form-control" id="images" name="images" rows="4" 
+                                      placeholder="Enter image URLs, one per line&#10;https://example.com/image1.jpg&#10;https://example.com/image2.jpg"><% 
+                                if (product && product.images && product.images.length > 0) {
+                                    product.images.forEach((img, index) => { %><%= img %><% if (index < product.images.length - 1) { %>
+<% } %><% }); 
+                                } else if (typeof formData !== 'undefined' && formData.images) {
+                                    if (Array.isArray(formData.images)) {
+                                        formData.images.forEach((img, index) => { %><%= img %><% if (index < formData.images.length - 1) { %>
+<% } %><% }); 
+                                    } else { %><%= formData.images %><% }
+                                } %></textarea>
+                            <small class="text-muted">Enter image URLs separated by new lines. For production, consider using image upload functionality.</small>
+                        </div>
+
+                        <% if (product) { %>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isActive" name="isActive" 
+                                       <%= product.isActive ? 'checked' : '' %>>
+                                <label class="form-check-label" for="isActive">
+                                    Active (Product will be visible on website)
+                                </label>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <div class="d-grid gap-2 d-md-block">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <%= product ? 'Update Product' : 'Add Product' %>
+                            </button>
+                            <a href="/admin/products" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+

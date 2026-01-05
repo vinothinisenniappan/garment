@@ -1,0 +1,200 @@
+/**
+ * Main CSS file
+ * Custom styles for the React application
+ */
+
+:root {
+  /* Desert Rose theme (client) */
+  --primary-color: #FFF1F2;        /* rose paper */
+  --primary-strong: #7C2D12;       /* deep terracotta for nav/footer */
+  --secondary-color: #FECACA;      /* soft rose */
+  --accent-color: #D97706;         /* warm amber */
+  --success-color: #10B981;        /* emerald */
+  --text-color: #1F2937;           /* slate-800 */
+  --muted-text: #6B7280;           /* gray 500 */
+  --light-bg: #FFF7ED;             /* peachy background */
+  --border-color: #F5D5CB;         /* soft rose border */
+  --surface-color: #FFFFFF;
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(124, 45, 18, 0.08);
+  --shadow-hover: 0 12px 28px rgba(124, 45, 18, 0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  background-color: var(--surface-color);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  color: var(--primary-strong);
+}
+
+p, .text-muted {
+  color: var(--muted-text);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Utility Classes */
+.text-primary-custom {
+  color: var(--primary-strong) !important;
+}
+
+.bg-light-custom {
+  background-color: var(--light-bg) !important;
+}
+
+/* Card hover effects */
+.card {
+  background: var(--surface-color);
+  border: none;
+  border-radius: var(--radius);
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: var(--shadow);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+  background-color: #FCA5A5;
+  border-color: #FCA5A5;
+}
+
+/* Outline Primary (override Bootstrap blue) */
+.btn-outline-primary {
+  color: var(--primary-strong);
+  border-color: var(--primary-strong);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-strong);
+  border-color: var(--primary-strong);
+  color: #fff;
+}
+
+/* Badge status styles */
+.badge-status-requested {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge-status-in-progress {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.badge-status-dispatched {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.badge-status-delivered {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+/* Footer styles */
+.footer {
+  background-color: var(--primary-strong);
+  color: white;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+/* Override Bootstrap bg-primary to theme strong pistachio */
+.bg-primary {
+  background-color: var(--primary-strong) !important;
+}
+
+.footer a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer a:hover {
+  color: white;
+}
+
+/* Navbar styles */
+.navbar {
+  background-color: var(--primary-strong) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  color: rgba(255,255,255,0.9) !important;
+  margin: 0 0.5rem;
+  transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fff !important;
+}
+
+/* Hero Section */
+.hero-section { display: none; }
+
+.hero-image {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+  min-height: 460px;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 768px) {
+  .hero-image {
+    min-height: 300px;
+    border-radius: 8px;
+  }
+}
+
+/* Loading spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-section p {
+    font-size: 1rem;
+  }
+}
+
