@@ -8,6 +8,7 @@ import ProductDetails from './components/pages/ProductDetails';
 import Inquiry from './components/pages/Inquiry';
 import SampleRequest from './components/pages/SampleRequest';
 import SampleTrack from './components/pages/SampleTrack';
+import SampleRequestSuccess from './components/pages/SampleRequestSuccess';
 import Contact from './components/pages/Contact';
 import InquirySuccess from './components/pages/InquirySuccess';
 import ThemeGuide from './components/pages/ThemeGuide';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/inquiry" element={<Inquiry />} />
             <Route path="/inquiry/success" element={<InquirySuccess />} />
             <Route path="/samples/request" element={<SampleRequest />} />
+            <Route path="/samples/success" element={<SampleRequestSuccess />} />
             <Route path="/samples/track" element={<SampleTrack />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/style" element={<ThemeGuide />} />
