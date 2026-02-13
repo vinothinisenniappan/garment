@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A2E73"/>
+      <stop offset="100%" stop-color="#17499b"/>
+    </linearGradient>
+    <linearGradient id="accent4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#ffd46a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg4)"/>
+  <g opacity="0.12">
+    <polygon points="0,800 600,0 1200,800" fill="#fff"/>
+  </g>
+  <g>
+    <circle cx="980" cy="170" r="120" fill="url(#accent4)"/>
+    <rect x="120" y="560" width="520" height="140" rx="20" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)"/>
+    <text x="150" y="620" fill="#FFFFFF" font-family="Segoe UI, Roboto, Arial" font-size="48" font-weight="700">Skilled Workforce</text>
+    <text x="150" y="660" fill="#ffd46a" font-family="Segoe UI, Roboto, Arial" font-size="24" font-weight="600">Operators & supervisors aligned on quality</text>
+  </g>
+</svg>

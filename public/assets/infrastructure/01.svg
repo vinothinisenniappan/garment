@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A2E73"/>
+      <stop offset="100%" stop-color="#123E95"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#ffd46a"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <rect width="1200" height="800" fill="url(#grid)"/>
+  <g opacity="0.25">
+    <circle cx="200" cy="200" r="180" fill="url(#accent)"/>
+    <circle cx="1050" cy="180" r="120" fill="url(#accent)"/>
+    <rect x="-60" y="520" width="480" height="180" rx="28" fill="#ffffff" opacity="0.08"/>
+  </g>
+  <g>
+    <rect x="60" y="560" width="540" height="140" rx="20" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)"/>
+    <text x="90" y="620" fill="#FFFFFF" font-family="Segoe UI, Roboto, Arial" font-size="48" font-weight="700">Manufacturing Floor</text>
+    <text x="90" y="660" fill="#ffd46a" font-family="Segoe UI, Roboto, Arial" font-size="24" font-weight="600">Organized lines • Clean & well-lit • QA at stages</text>
+  </g>
+</svg>
