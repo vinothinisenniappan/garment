@@ -4,11 +4,11 @@
   "description": "Corporate website for garment manufacturing and export company (MERN Stack)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
-    "client": "cd client && npm start",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "cd client && npm run build"
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run frontend\"",
+    "build": "cd frontend && npm run build"
   },
   "keywords": ["garment", "export", "manufacturing", "mern"],
   "author": "",

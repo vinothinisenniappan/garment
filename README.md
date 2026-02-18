@@ -80,21 +80,21 @@ A comprehensive corporate website for a garment manufacturing and export company
 ## Project Structure
 
 ```
-├── config/          # Configuration files
-├── controllers/     # Business logic controllers
-├── middleware/      # Custom middleware (authentication, etc.)
-├── models/          # MongoDB models
-├── public/          # Static files (CSS, JS, images)
-│   ├── css/
-│   └── js/
-├── routes/          # Route definitions
-├── scripts/         # Utility scripts
-├── views/           # EJS templates
-│   ├── admin/       # Admin views
-│   ├── partials/    # Reusable partials (header, footer)
-│   └── *.ejs        # Public views
-├── server.js        # Main server file
-└── package.json     # Dependencies and scripts
+├── backend/         # Node.js Express server
+│   ├── config/      # Configuration files
+│   ├── controllers/ # Business logic controllers
+│   ├── middleware/  # Custom middleware
+│   ├── models/      # MongoDB models
+│   ├── public/      # Static files (CSS, JS, images)
+│   ├── routes/      # Route definitions
+│   ├── scripts/     # Utility scripts
+│   ├── views/       # EJS templates
+│   └── server.js    # Backend entry point
+├── frontend/        # React Vite application
+│   ├── src/         # React components & styles
+│   └── ...
+├── package.json     # Orchestration scripts
+└── README.md
 ```
 
 ## Usage

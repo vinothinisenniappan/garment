@@ -1,0 +1,46 @@
+import { Routes, Route } from 'react-router-dom'
+import './styles.css'
+import { useEffect, useState } from 'react'
+import Header from './components/Header'
+import Footer from './components/Footer'
+import Home from './pages/Home'
+import Contact from './pages/Contact'
+import BuyerInquiry from './pages/BuyerInquiry'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
+import RequireAuth from './components/RequireAuth'
+import { AuthProvider } from './context/AuthContext'
+import Infrastructure from './pages/Infrastructure'
+import History from './pages/History'
+
+export default function App() {
+  const [theme, setTheme] = useState(() => {
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('theme') : null;
+    return saved === 'dark' ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+
+  return (
+    <AuthProvider>
+      <div>
+        <Header theme={theme} onToggleTheme={toggleTheme} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/buyer-inquiry" element={<BuyerInquiry />} />
+          <Route path="/infrastructure" element={<Infrastructure />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
+        </Routes>
+        <Footer />
+      </div>
+    </AuthProvider>
+  )
+}
