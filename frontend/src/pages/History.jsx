@@ -29,7 +29,7 @@ const historyData = [
         year: '1997',
         subtitle: 'CROCODILE',
         text: "Execution of the Sub-Licensing Agreement with our Subsidiary, CPPL to manufacture, distribute and market products under the 'Crocodile' brand.",
-        image: '/assets/infrastructure/i1.jpeg'
+        image: '/assets/infrastructure/maine.png'
     }
 ];
 
