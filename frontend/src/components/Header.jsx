@@ -15,7 +15,11 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const headerClass = `header ${isHome && !isScrolled ? 'header--transparent' : ''} ${isScrolled ? 'header--scrolled' : ''}`;
+  const headerClass = `header ${
+    isHome
+      ? (!isScrolled ? 'header--transparent' : 'header--scrolled')
+      : `header--internal ${isScrolled ? 'header--scrolled' : ''}`
+  }`;
 
   return (
     <header className={headerClass}>

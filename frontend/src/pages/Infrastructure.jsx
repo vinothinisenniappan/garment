@@ -8,14 +8,16 @@ export default function Infrastructure() {
 
   return (
     <main className="infrastructure-page">
-      <section className="internal-hero">
-        <div className="container">
-          <h1>Manufacturing Infrastructure</h1>
-          <p>State-of-the-art facilities designed for precision, scale, and sustainable garment production.</p>
+      <section className="history-hero">
+        <div className="history-hero__inner">
+          <div className="history-hero__text-group">
+            <h1 className="history-hero__title">Manufacturing Infrastructure</h1>
+          
+          </div>
         </div>
       </section>
 
-      <div className="container">
+      <div className="page-container">
         <section className="infra-intro pro-card" style={{ marginBottom: '60px' }}>
           <div className="grid grid--two">
             <div className="content">

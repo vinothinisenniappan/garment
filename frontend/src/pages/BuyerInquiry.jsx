@@ -1,14 +1,16 @@
 export default function BuyerInquiry() {
   return (
     <main className="inquiry-page">
-      <section className="internal-hero">
-        <div className="container">
-          <h1>Buyer Inquiry</h1>
-          <p>Request a quote or share your technical specifications with our production team.</p>
+      <section className="history-hero">
+        <div className="history-hero__inner">
+          <div className="history-hero__text-group">
+            <h1 className="history-hero__title">Buyer Inquiry</h1>
+            <p className="history-hero__description">Request a quote or share your technical specifications with our production team.</p>
+          </div>
         </div>
       </section>
 
-      <div className="container" style={{ marginBottom: '80px' }}>
+      <div className="page-container" style={{ marginBottom: '80px' }}>
         <div className="pro-card pro-form-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
           <form className="pro-form">
             <div className="grid grid--two" style={{ gap: '20px' }}>

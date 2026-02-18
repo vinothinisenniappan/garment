@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import './styles.css'
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
@@ -14,6 +14,8 @@ import Infrastructure from './pages/Infrastructure'
 import History from './pages/History'
 
 export default function App() {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
   const [theme, setTheme] = useState(() => {
     const saved = typeof window !== 'undefined' ? window.localStorage.getItem('theme') : null;
     return saved === 'dark' ? 'dark' : 'light';
@@ -28,7 +30,7 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <div>
+      <div className={isHome ? 'app app--home' : 'app app--internal'}>
         <Header theme={theme} onToggleTheme={toggleTheme} />
         <Routes>
           <Route path="/" element={<Home />} />

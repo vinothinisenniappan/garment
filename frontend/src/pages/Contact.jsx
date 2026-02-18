@@ -1,14 +1,16 @@
 export default function Contact() {
   return (
     <main className="contact-page">
-      <section className="internal-hero">
-        <div className="container">
-          <h1>Get In Touch</h1>
-          <p>We’re here to discuss your requirements, factory walkthroughs, and manufacturing partnerships.</p>
+      <section className="history-hero">
+        <div className="history-hero__inner">
+          <div className="history-hero__text-group">
+            <h1 className="history-hero__title">Get In Touch</h1>
+            
+          </div>
         </div>
       </section>
 
-      <div className="container" style={{ marginBottom: '80px' }}>
+      <div className="page-container" style={{ marginBottom: '80px' }}>
         <div className="grid grid--two">
           <section className="contact-info pro-card">
             <h2 style={{ color: 'var(--nav-bg)', marginBottom: '20px' }}>Headquarters</h2>

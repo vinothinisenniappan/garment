@@ -1,20 +1,22 @@
-/* Frontend styles copied from client/src/styles.css to keep design consistent */
-
 :root {
 	--bg: #FFFFFF;
 	--text: #1F1F1F;
 	--muted: #6F6F6F;
-	--accent: lab(27.44% 19.5 -35.1);
-	--border: #E6E6E6;
+	--accent: lab(23.74% 30.29 -48.71);
+	--border: #ffffff;
 	--card: #FFFFFF;
-	--nav-bg: #0A2E73;
-	--nav-text: #FFFFFF;
+	--nav-bg: #071b54;
+	--nav-text: #3f1414;
 	--header-height: 80px;
 	--header-scrolled-height: 70px;
-	--glass: rgba(255, 255, 255, 0.85);
+	--glass: rgba(255, 255, 255, 0);
 	--shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 	--radius: 12px;
 	--transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	--glass-blue: rgba(10, 46, 115, 0.6);
+	--glass-blue-strong: rgba(10, 46, 115, 0.72);
+	--glass-blue-border: rgba(255, 255, 255, 0.18);
+	--glass-blue-shadow: 0 8px 24px rgba(10, 46, 115, 0.25);
 }
 
 *,
@@ -32,7 +34,6 @@ body {
 	line-height: 1.6;
 }
 
-/* Ensure all UI controls inherit Arial */
 html,
 body,
 button,
@@ -72,6 +73,26 @@ select {
 	color: #FFFFFF;
 }
 
+.header--internal {
+	/* Footer blue header for all non-Home pages */
+	background: #051a44;
+	color: #FFFFFF;
+	box-shadow: var(--shadow);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.header--internal .brand {
+	color: white;
+}
+
+.header--internal .nav-link {
+	color: white;
+}
+
+.header--internal .nav-link::after {
+	background: #FFFFFF;
+}
+
 .header--scrolled {
 	height: var(--header-scrolled-height);
 	background: var(--glass);
@@ -82,6 +103,27 @@ select {
 .header--scrolled .brand,
 .header--scrolled .nav-link {
 	color: var(--text);
+}
+
+/* Keep blue glass effect when scrolled on internal pages */
+.header--internal.header--scrolled {
+	/* Keep footer blue when scrolled on internal pages */
+	background: #051a44;
+	box-shadow: var(--shadow);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.header--internal.header--scrolled .brand,
+.header--internal.header--scrolled .nav-link {
+	color: var(--text);
+}
+
+.header--internal.header--scrolled .brand {
+	color: var(--nav-bg);
+}
+
+.header--internal.header--scrolled .nav-link::after {
+	background: #FFFFFF;
 }
 
 .header-inner {
@@ -233,6 +275,51 @@ select {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 0 20px;
+}
+
+/* Footer-blue container on all internal pages */
+.app--internal .container {
+	background: #051a44;
+	color: rgba(255, 255, 255, 0.95);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+/* Keep cards readable inside blue containers */
+.app--internal .pro-card,
+.app--internal .pro-card--compact {
+	background: #FFFFFF;
+	color: var(--text);
+}
+
+/* Specifically make Infrastructure and Contact hero + containers blue */
+.infrastructure-page .internal-hero,
+.contact-page .internal-hero {
+	background: #051a44;
+
+}
+
+.infrastructure-page .internal-hero::before,
+.contact-page .internal-hero::before {
+	background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent);
+}
+
+.infrastructure-page .container,
+.contact-page .container {
+	background: #ffffff;
+	color: rgba(255, 255, 255, 0.95);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+}
+
+.infrastructure-page .pro-card,
+.infrastructure-page .pro-card--compact,
+.contact-page .pro-card,
+.contact-page .pro-card--compact {
+	background: #FFFFFF;
+	color: var(--text);
 }
 
 /* Professional Cards */
@@ -1109,10 +1196,11 @@ select {
 
 .history-hero {
 	background-color: var(--nav-bg);
-	color: #FFFFFF;
-	padding: 80px 40px 100px;
+	color: #ffffff;
+	padding: 80px 40px 80px;
 	position: relative;
 	overflow: hidden;
+	text-align: center;
 }
 
 .history-hero::before {
@@ -1149,9 +1237,12 @@ select {
 .history-hero__title {
 	font-size: 72px;
 	font-weight: 800;
-	margin: 0;
+	margin: 20px;
 	line-height: 1;
-	text-transform: uppercase;
+	/* text-transform: uppercase; */
+	font-family: 'Playwrite NG Modern', Georgia, serif;
+
+
 }
 
 .history-hero__description {
@@ -1161,6 +1252,7 @@ select {
 	line-height: 1.6;
 	opacity: 0.85;
 	padding-bottom: 5px;
+
 }
 
 /* Timeline Layout */
@@ -1169,6 +1261,13 @@ select {
 	margin: 60px auto;
 	padding: 0 20px;
 	position: relative;
+}
+
+/* Shared internal page container (matches timeline sizing) */
+.page-container {
+	max-width: 1000px;
+	margin: 60px auto;
+	padding: 0 20px;
 }
 
 .timeline-item {
