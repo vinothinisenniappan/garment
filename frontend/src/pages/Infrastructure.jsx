@@ -31,7 +31,7 @@ export default function Infrastructure() {
               </ul>
             </div>
             <div className="media">
-              <img src="/assets/infrastructure/main.png" alt="Production Floor" style={{ width: '100%', borderRadius: 'var(--radius)', height: '100%', objectFit: 'cover' }} />
+              <img src="/assets/infrastructure/f7.JPG" alt="Production Floor" style={{ width: '100%', borderRadius: 'var(--radius)', height: '100%', objectFit: 'cover' }} />
             </div>
           </div>
         </section>
@@ -52,9 +52,9 @@ export default function Infrastructure() {
         <section className="infra-gallery-pro" style={{ marginBottom: '80px' }}>
           <h2 style={{ marginBottom: '30px' }}>Inland Facilities</h2>
           <div className="grid grid--three">
-            <img src="/assets/infrastructure/i1.jpeg" alt="Machinery" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
-            <img src="/assets/infrastructure/i2.jpeg" alt="Production Line" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
-            <img src="/assets/infrastructure/i3.jpeg" alt="Quality Check" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
+            <img src="/assets/infrastructure/a.webp" alt="Machinery" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
+            <img src="/assets/infrastructure/maine.png" alt="Production Line" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
+            <img src="/assets/infrastructure/o.jpg" alt="Quality Check" style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: 'var(--radius)' }} />
           </div>
         </section>
       </div>

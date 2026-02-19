@@ -28,6 +28,8 @@ router.get('/check-auth', adminController.checkAuth);
 
 // Dashboard
 router.get('/dashboard', isAuthenticated, adminController.getDashboard);
+// Public read-only dashboard for frontend without session auth
+router.get('/dashboard-public', adminController.getDashboardPublic);
 
 // Product management
 router.get('/products', isAuthenticated, adminController.getProducts);

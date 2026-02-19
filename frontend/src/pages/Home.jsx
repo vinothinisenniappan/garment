@@ -24,17 +24,17 @@ export default function Home() {
         <h2>Our Core Specialization</h2>
         <div className="grid">
           <div className="card">
-            <img src="/assets/infrastructure/i1.jpeg" alt="T-Shirts" />
+            <img src="/assets/infrastructure/f4.avif" alt="T-Shirts" />
             <h3>Basic T-Shirts</h3>
             <p>High-quality hosiery cotton basics.</p>
           </div>
           <div className="card">
-            <img src="/assets/infrastructure/i2.jpeg" alt="Polo Shirts" />
+            <img src="/assets/infrastructure/f6.jpg" alt="Polo Shirts" />
             <h3>Premium Polos</h3>
             <p>Refined knits for global markets.</p>
           </div>
           <div className="card">
-            <img src="/assets/infrastructure/i3.jpeg" alt="Activewear" />
+            <img src="/assets/infrastructure/f8.jpg" alt="Activewear" />
             <h3>Activewear</h3>
             <p>Performance fabrics and precise stitching.</p>
           </div>

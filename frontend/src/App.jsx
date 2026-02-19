@@ -3,6 +3,7 @@ import './styles.css'
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import Contact from './pages/Contact'
 import BuyerInquiry from './pages/BuyerInquiry'
@@ -12,6 +13,7 @@ import RequireAuth from './components/RequireAuth'
 import { AuthProvider } from './context/AuthContext'
 import Infrastructure from './pages/Infrastructure'
 import History from './pages/History'
+import Products from './pages/Products'
 
 export default function App() {
   const location = useLocation();
@@ -32,12 +34,14 @@ export default function App() {
     <AuthProvider>
       <div className={isHome ? 'app app--home' : 'app app--internal'}>
         <Header theme={theme} onToggleTheme={toggleTheme} />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/buyer-inquiry" element={<BuyerInquiry />} />
           <Route path="/infrastructure" element={<Infrastructure />} />
           <Route path="/history" element={<History />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
         </Routes>

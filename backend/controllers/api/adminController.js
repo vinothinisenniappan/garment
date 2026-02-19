@@ -129,6 +129,39 @@ exports.getDashboard = async (req, res) => {
   }
 };
 
+// Public dashboard (read-only) for frontend without session auth
+exports.getDashboardPublic = async (req, res) => {
+  try {
+    const stats = {
+      totalProducts: await Product.countDocuments({ isActive: true }),
+      totalBuyers: await Buyer.countDocuments(),
+      totalSamples: await SampleRequest.countDocuments(),
+      pendingSamples: await SampleRequest.countDocuments({ status: 'Requested' }),
+      newInquiries: await Buyer.countDocuments({ status: 'New' })
+    };
+
+    const recentBuyers = await Buyer.find().sort({ submittedAt: -1 }).limit(5);
+    const recentSamples = await SampleRequest.find()
+      .populate('productId', 'name')
+      .sort({ requestedAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      stats,
+      recentBuyers,
+      recentSamples
+    });
+  } catch (error) {
+    console.error('Error loading public dashboard:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error loading dashboard data',
+      error: error.message
+    });
+  }
+};
+
 // Product management
 exports.getProducts = async (req, res) => {
   try {

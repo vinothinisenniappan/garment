@@ -5,29 +5,29 @@ const historyData = [
         year: '2019',
         subtitle: 'ECO SEWING FACTORIES AT PATLUR & ANNUR',
         text: 'Spinning Mill production capacity expansion to 25 MT / day. Two Brand New ECO satellite sewing factories.',
-        image: '/assets/infrastructure/i2.jpeg'
+        image: '/assets/infrastructure/f1.webp'
     },
     {
         year: '2017',
         subtitle: 'KNITTING DIVISION',
         text: 'The knitted division was expanded to cope with high-quality and high-volume demand.',
-        image: '/assets/infrastructure/i4.jpeg'
+        image: '/assets/infrastructure/f2.webp'
     },
     {
         year: '2016',
         subtitle: 'LISTED ON BSE / NSE',
         text: 'In August 2016, SREE ANJANEYA got listed on BSE and NSE.',
-        image: '/assets/infrastructure/o.jpg'
+        image: '/assets/infrastructure/f3.avif'
     },
     {
         year: '2015',
         subtitle: 'CROCODILE',
         text: "Execution of the Sub-Licensing Agreement with our Subsidiary, CPPL to manufacture, distribute and market products under the 'Crocodile' brand.",
-        image: '/assets/infrastructure/i1.jpeg'
+        image: '/assets/infrastructure/f4.avif'
     },
         {
-        year: '1997',
-        subtitle: 'CROCODILE',
+        year: '1998',
+        subtitle: 'FOUDATION',
         text: "Execution of the Sub-Licensing Agreement with our Subsidiary, CPPL to manufacture, distribute and market products under the 'Crocodile' brand.",
         image: '/assets/infrastructure/maine.png'
     }
