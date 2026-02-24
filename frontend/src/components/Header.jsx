@@ -42,6 +42,7 @@ export default function Header() {
         <Link to="/" className="brand">SREE ANJANEYA EXPORTS</Link>
         <nav className="nav">
           <Link to="/" className="nav-link">HOME</Link>
+          <Link to="/history" className="nav-link">HISTORY</Link>
           <Link to="/contact" className="nav-link">CONTACT</Link>
         </nav>
         <button aria-label="Open menu" className="nav-menu-icon" onClick={() => setMenuOpen(v => !v)}>
