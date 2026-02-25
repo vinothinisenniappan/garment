@@ -73,6 +73,24 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Socket.io initialization
+const io = require('socket.io')(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+app.set('socketio', io);
+
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 });

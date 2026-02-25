@@ -18,7 +18,7 @@ exports.submitInquiry = async (req, res) => {
         errors: errors.array()
       });
     }
-    
+
     const buyerData = {
       companyName: req.body.companyName,
       contactPerson: req.body.contactPerson,
@@ -30,14 +30,25 @@ exports.submitInquiry = async (req, res) => {
       businessType: req.body.businessType,
       requirements: req.body.requirements,
       annualVolume: req.body.annualVolume,
-      preferredCategories: Array.isArray(req.body.preferredCategories) 
-        ? req.body.preferredCategories 
+      preferredCategories: Array.isArray(req.body.preferredCategories)
+        ? req.body.preferredCategories
         : req.body.preferredCategories ? [req.body.preferredCategories] : []
     };
-    
+
     const buyer = new Buyer(buyerData);
     await buyer.save();
-    
+
+    // Emit real-time update
+    const io = req.app.get('socketio');
+    if (io) {
+      io.emit('new-inquiry', {
+        id: buyer._id,
+        contactPerson: buyer.contactPerson,
+        email: buyer.email,
+        submittedAt: buyer.submittedAt
+      });
+    }
+
     res.json({
       success: true,
       message: 'Inquiry submitted successfully',
