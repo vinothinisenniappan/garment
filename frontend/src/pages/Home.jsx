@@ -8,13 +8,13 @@ export default function Home() {
 
         <div className="hero-home__content">
           <div className="hero-home__top-right">
-            <h1 className="hero-home__solid-text">
-              <br />  EXPORTS
+            <h1 className="hero-home__outline-text">
+              SREE<br />ANJANEYA
             </h1>
           </div>
           <div className="hero-home__bottom-right">
-            <h1 className="hero-home__outline-text">
-             SREE<br />ANJANEYA
+            <h1 className="hero-home__solid-text">
+              EXPORTS
             </h1>
           </div>
         </div>

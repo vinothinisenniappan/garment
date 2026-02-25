@@ -127,7 +127,7 @@ select {
 }
 
 .brand {
-	font-size: 20px;
+	font-size: clamp(16px, 4vw, 20px);
 	font-weight: 800;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -182,7 +182,8 @@ select {
 	flex-direction: column;
 	gap: 6px;
 	cursor: pointer;
-	padding: 10px;
+	padding: 15px;
+	/* Increased for better touch target */
 	appearance: none;
 	background: transparent;
 	border: none;
@@ -364,6 +365,8 @@ select {
 	font-size: 16px;
 	transition: var(--transition);
 	width: 100%;
+	appearance: none;
+	/* Better mobile look */
 }
 
 .pro-input:focus {
@@ -395,6 +398,7 @@ select {
 .products {
 	padding: 40px;
 	text-align: center;
+	background-color: white;
 }
 
 .products h2 {
@@ -406,54 +410,57 @@ select {
 }
 
 .certifications {
-	padding: 60px 80px;
-}
-
-@media (max-width: 900px) {
-	.certifications {
-		padding: 40px 20px;
-	}
+	padding: 120px 40px;
+	border-top: 1px solid var(--border);
+	background: #ffffff;
 }
 
 .certifications h2 {
-	font-size: 22px;
-	letter-spacing: 0.12em;
+	font-size: clamp(20px, 4vw, 24px);
+	letter-spacing: 0.15em;
 	text-transform: uppercase;
 	color: var(--muted);
-	margin-bottom: 10px;
+	margin-bottom: 40px;
 	text-align: center;
 }
 
 .cert-row {
 	display: flex;
-	align-items: center;
-	gap: 100px;
-	margin-top: 30px;
+	justify-content: center;
 }
 
-.divider {
-	width: 20px;
-	height: 100px;
-
+@media (max-width: 900px) {
+	.certifications {
+		padding: 60px 20px;
+	}
 }
 
 .logos {
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 80px;
 	align-items: center;
-	gap: 60px;
-	flex-wrap: wrap;
-	justify-content: center;
+	justify-items: center;
+	width: 100%;
+	max-width: 1100px;
 }
 
 .logos img {
 	height: 120px;
 	width: auto;
+	max-width: 100%;
 	object-fit: contain;
+	transition: var(--transition);
+}
+
+.logos img:hover {
+	transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
 	.logos {
-		gap: 30px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 40px;
 	}
 
 	.logos img {
@@ -1118,64 +1125,83 @@ select {
 	position: relative;
 	min-height: 100vh;
 	display: flex;
-	align-items: center;
+	align-items: stretch;
 	overflow: hidden;
 	background-size: cover;
-	background-position: center 2%;
+	background-position: center top;
 	background-repeat: no-repeat;
-	padding: 40px;
+	padding: 0;
 }
 
 .hero-home::after {
 	content: "";
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(90deg, rgba(3, 70, 148, 0.4) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(3, 70, 148, 0.4) 100%);
+	background: linear-gradient(to right, rgba(3, 70, 148, 0.45) 0%, transparent 50%, rgba(3, 70, 148, 0.45) 100%);
 	pointer-events: none;
 }
-
 
 .hero-home__content {
 	position: relative;
 	z-index: 5;
 	width: 100%;
-	height: 100%;
-	padding-top: 100px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	/* Center vertically */
+	align-items: flex-end;
+	/* Align to the right */
+	padding: 120px 60px 80px;
+	gap: 20px;
+	/* Group them closer */
 }
 
 .hero-home__top-right {
-	position: absolute;
-	top: 15%;
-	right: 5%;
 	text-align: right;
 }
 
 .hero-home__bottom-right {
-	position: absolute;
-	bottom: 8%;
-	right: 5%;
 	text-align: right;
 }
 
+@media (max-width: 900px) {
+	.hero-home {
+		min-height: 100svh;
+		background-position: center top;
+	}
+
+	.hero-home__content {
+		padding: 100px 30px 60px;
+	}
+
+	.hero-home__top-right,
+	.hero-home__bottom-right {
+		align-self: stretch;
+		text-align: center;
+	}
+}
+
 .hero-home__outline-text {
-	font-size: clamp(32px, 8vw, 84px);
-	font-weight: 400;
+	font-size: clamp(40px, 10vw, 92px);
+	font-weight: 300;
 	color: transparent;
-	-webkit-text-stroke: 1.5px #fff;
-	line-height: 0.85;
+	-webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+	line-height: 1;
 	text-transform: uppercase;
 	margin: 0;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.1em;
 }
 
 .hero-home__solid-text {
-	font-size: clamp(36px, 10vw, 110px);
-	font-weight: 700;
+	font-size: clamp(32px, 8vw, 84px);
+	font-weight: 800;
 	color: #fff;
-	line-height: 0.7;
+	line-height: 0.5;
 	text-transform: uppercase;
 	margin: 0;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.05em;
+	padding: 1px 20px;
+	backdrop-filter: blur(4px);
 }
 
 .hero-tagline {
@@ -1433,6 +1459,16 @@ select {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-end;
+	gap: 40px;
+}
+
+@media (max-width: 900px) {
+	.history-hero__inner {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 20px;
+	}
 }
 
 .history-hero__text-group {
