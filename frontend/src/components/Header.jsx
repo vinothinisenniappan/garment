@@ -30,20 +30,19 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const headerClass = `header ${
-    isHome
+  const headerClass = `header ${isHome
       ? (!isScrolled ? 'header--transparent' : 'header--scrolled')
       : `header--internal ${isScrolled ? 'header--scrolled' : ''}`
-  }`;
+    }`;
 
   return (
     <header className={headerClass}>
       <div className="header-inner">
         <Link to="/" className="brand">SREE ANJANEYA EXPORTS</Link>
         <nav className="nav">
-          <Link to="/" className="nav-link">HOME</Link>
-          <Link to="/history" className="nav-link">HISTORY</Link>
-          <Link to="/contact" className="nav-link">CONTACT</Link>
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/history" className="nav-link">History</Link>
+          <Link to="/contact" className="nav-link">Contact</Link>
         </nav>
         <button aria-label="Open menu" className="nav-menu-icon" onClick={() => setMenuOpen(v => !v)}>
           <span></span>

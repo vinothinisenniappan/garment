@@ -30,10 +30,12 @@ export default function App() {
 
   const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
 
+  const isAdmin = location.pathname.startsWith('/admin');
+
   return (
     <AuthProvider>
       <div className={isHome ? 'app app--home' : 'app app--internal'}>
-        <Header theme={theme} onToggleTheme={toggleTheme} />
+        {!isAdmin && <Header theme={theme} onToggleTheme={toggleTheme} />}
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -45,7 +47,7 @@ export default function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
         </Routes>
-        <Footer />
+        {!isAdmin && <Footer />}
       </div>
     </AuthProvider>
   )

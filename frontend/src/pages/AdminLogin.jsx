@@ -23,31 +23,32 @@ export default function AdminLogin() {
 
   return (
     <main className="admin-login-page">
-      <section className="history-hero">
-        <div className="history-hero__inner">
-          <div className="history-hero__text-group">
-            <h1 className="history-hero__title">Admin Portal</h1>
-          </div>
-        </div>
-      </section>
+      <div className="admin-login-overlay"></div>
+      <div className="admin-login-container">
+        <div className="admin-login-box glassmorphic">
+          <header className="admin-login-header">
+            <div className="admin-login-logo">◎</div>
+            <h1>Admin Portal</h1>
+            <p>Authorized access only</p>
+          </header>
 
-      <div className="page-container" style={{ marginBottom: '100px' }}>
-        <div className="pro-card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--nav-bg)' }}>Authorized Access</h2>
           <form className="pro-form" onSubmit={handleSubmit}>
             <div className="pro-field">
-              <label>Administrator ID</label>
+              <label htmlFor="adminId">Administrator ID</label>
               <input
+                id="adminId"
                 type="text"
                 className="pro-input"
-                placeholder="Enter ID"
+                placeholder="Enter email address"
                 value={adminId}
                 onChange={(e) => setAdminId(e.target.value)}
+                autoFocus
               />
             </div>
             <div className="pro-field">
-              <label>Passphrase</label>
+              <label htmlFor="passphrase">Passphrase</label>
               <input
+                id="passphrase"
                 type="password"
                 className="pro-input"
                 placeholder="••••••••"
@@ -55,14 +56,25 @@ export default function AdminLogin() {
                 onChange={(e) => setPass(e.target.value)}
               />
             </div>
+
             {error && (
-              <div style={{ color: 'crimson', fontWeight: 600, fontSize: '13px' }}>{error}</div>
+              <div className="admin-login-error-msg">
+                <span>⚠</span> {error}
+              </div>
             )}
-            <button type="submit" className="pro-button" style={{ width: '100%', marginTop: '10px' }}>Sign In</button>
+
+            <button type="submit" className="pro-button primary-btn">
+              <span>Secure Sign In</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
           </form>
-          <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '12px', color: 'var(--muted)' }}>
-            Protected by enterprise-grade encryption.
-          </p>
+
+          <footer className="admin-login-footer">
+            <p>© 2026 Admin Control System</p>
+            <span>Protected by enterprise-level encryption</span>
+          </footer>
         </div>
       </div>
     </main>

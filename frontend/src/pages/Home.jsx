@@ -14,7 +14,7 @@ export default function Home() {
           </div>
           <div className="hero-home__bottom-right">
             <h1 className="hero-home__outline-text">
-              SREE<br />ANJANEYA
+             SREE<br />ANJANEYA
             </h1>
           </div>
         </div>
@@ -43,23 +43,23 @@ export default function Home() {
 
         </div>
 
-        
+
       </section>
 
-       <section className="certifications">
-  <h2>Certifications</h2>
+      <section className="certifications">
+        <h2>Certifications</h2>
 
-  <div className="cert-row">
-    <span className="divider"></span>
+        <div className="cert-row">
+          <span className="divider"></span>
 
-    <div className="logos">
-      <img src="/assets/infrastructure/c1.jpg" alt="Sedex" />
-      <img src="/assets/infrastructure/c2.png" alt="BSCI" />
-      <img src="/assets/infrastructure/c3.png" alt="WRAP" />
-      <img src="/assets/infrastructure/c4.png" alt="APEDA" />
-    </div>
-  </div>
-        </section>
+          <div className="logos">
+            <img src="/assets/infrastructure/c1.jpg" alt="Sedex" />
+            <img src="/assets/infrastructure/c2.png" alt="BSCI" />
+            <img src="/assets/infrastructure/c3.png" alt="WRAP" />
+            <img src="/assets/infrastructure/c4.png" alt="APEDA" />
+          </div>
+        </div>
+      </section>
     </main>
   )
 }

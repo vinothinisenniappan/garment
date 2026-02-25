@@ -25,9 +25,9 @@ const historyData = [
         text: "Execution of the Sub-Licensing Agreement with our Subsidiary, CPPL to manufacture, distribute and market products under the 'Crocodile' brand.",
         image: '/assets/infrastructure/f4.avif'
     },
-        {
-        year: '1998',
-        subtitle: 'FOUDATION',
+    {
+        year: '1997',
+        subtitle: 'FOUNDATION',
         text: "Execution of the Sub-Licensing Agreement with our Subsidiary, CPPL to manufacture, distribute and market products under the 'Crocodile' brand.",
         image: '/assets/infrastructure/maine.png'
     }
