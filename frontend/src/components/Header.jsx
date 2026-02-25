@@ -31,8 +31,8 @@ export default function Header() {
   }, []);
 
   const headerClass = `header ${isHome
-      ? (!isScrolled ? 'header--transparent' : 'header--scrolled')
-      : `header--internal ${isScrolled ? 'header--scrolled' : ''}`
+    ? (!isScrolled ? 'header--transparent' : 'header--scrolled')
+    : `header--internal ${isScrolled ? 'header--scrolled' : ''}`
     }`;
 
   return (
@@ -56,10 +56,12 @@ export default function Header() {
             <button className="nav-overlay__close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>×</button>
             <div className="nav-overlay__title">Explore</div>
             <div className="nav-overlay__links">
+              <Link to="/" className="nav-overlay__link">Home</Link>
               <Link to="/history" className="nav-overlay__link">History</Link>
               <Link to="/products" className="nav-overlay__link">Products</Link>
               <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
               <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
+              <Link to="/contact" className="nav-overlay__link">Contact</Link>
             </div>
           </div>
         </div>
