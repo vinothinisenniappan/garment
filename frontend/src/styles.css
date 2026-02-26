@@ -1180,7 +1180,11 @@ select {
 @media (max-width: 768px) {
 	.hero-home {
 		min-height: 80vh;
-		background-position: center center;
+		background-position: center 15% !important;
+	}
+
+	.hero-home::after {
+		background: linear-gradient(135deg, rgba(3, 70, 148, 0.5) 0%, rgba(3, 70, 148, 0.1) 50%, rgba(3, 70, 148, 0.5) 100%);
 	}
 
 	.hero-home__content {
