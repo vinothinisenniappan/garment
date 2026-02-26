@@ -3,7 +3,7 @@ export default function Home() {
     <main className="home-page">
       <section
         className="hero-home"
-        style={{ backgroundImage: "url('/assets/infrastructure/main.jpg')" }}
+        style={{ backgroundImage: "url('/assets/infrastructure/main.png')" }}
       >
 
         <div className="hero-home__content">
