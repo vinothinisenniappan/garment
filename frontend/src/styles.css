@@ -437,12 +437,13 @@ select {
 
 .logos {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	gap: 80px;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 40px;
 	align-items: center;
 	justify-items: center;
 	width: 100%;
 	max-width: 1100px;
+	margin: 0 auto;
 }
 
 .logos img {
@@ -460,11 +461,15 @@ select {
 @media (max-width: 768px) {
 	.logos {
 		grid-template-columns: repeat(2, 1fr);
-		gap: 40px;
+		gap: 30px;
 	}
 
 	.logos img {
-		height: 80px;
+		height: 60px;
+	}
+
+	.certifications {
+		padding: 60px 20px;
 	}
 }
 
@@ -477,7 +482,12 @@ select {
 
 @media (max-width: 768px) {
 	.grid {
-		gap: 15px;
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.grid--three {
+		grid-template-columns: 1fr;
 	}
 }
 
@@ -496,6 +506,7 @@ select {
 	.grid--two,
 	.grid--three {
 		grid-template-columns: 1fr;
+		gap: 30px;
 	}
 }
 
@@ -1048,10 +1059,15 @@ select {
 	margin-bottom: 60px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
 	.footer-grid {
 		grid-template-columns: 1fr;
-		gap: 30px;
+		gap: 40px;
+		text-align: center;
+	}
+
+	.footer-contact li {
+		justify-content: center;
 	}
 }
 
@@ -1137,7 +1153,7 @@ select {
 	content: "";
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(to right, rgba(3, 70, 148, 0.45) 0%, transparent 50%, rgba(3, 70, 148, 0.45) 100%);
+	background: linear-gradient(135deg, rgba(3, 70, 148, 0.7) 0%, rgba(3, 70, 148, 0.2) 50%, rgba(3, 70, 148, 0.7) 100%);
 	pointer-events: none;
 }
 
@@ -1148,12 +1164,9 @@ select {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	/* Center vertically */
 	align-items: flex-end;
-	/* Align to the right */
-	padding: 120px 60px 80px;
-	gap: 20px;
-	/* Group them closer */
+	padding: 120px 80px 80px;
+	gap: 15px;
 }
 
 .hero-home__top-right {
@@ -1164,44 +1177,64 @@ select {
 	text-align: right;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
 	.hero-home {
-		min-height: 100svh;
-		background-position: center top;
+		min-height: 80vh;
+		background-position: center center;
 	}
 
 	.hero-home__content {
-		padding: 100px 30px 60px;
+		padding: 80px 20px;
+		align-items: center;
+		text-align: center;
+		justify-content: center;
 	}
 
 	.hero-home__top-right,
 	.hero-home__bottom-right {
-		align-self: stretch;
 		text-align: center;
+		align-self: center;
+	}
+
+	.hero-home__outline-text {
+		font-size: clamp(40px, 15vw, 64px);
+		line-height: 1;
+		font-weight: 900;
+	}
+
+	.hero-home__solid-text {
+		font-size: clamp(32px, 12vw, 48px);
+		line-height: 1.2;
+	}
+
+	.hero-tagline {
+		font-size: 20px;
 	}
 }
 
 .hero-home__outline-text {
-	font-size: clamp(40px, 10vw, 92px);
-	font-weight: 300;
-	color: transparent;
-	-webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+	font-size: clamp(48px, 12vw, 110px);
+	font-weight: 900;
+	color: #fff;
+	line-height: 0.9;
+	text-transform: uppercase;
+	margin: 0;
+	letter-spacing: 0.05em;
+	text-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.hero-home__solid-text {
+	font-size: clamp(36px, 10vw, 92px);
+	font-weight: 900;
+	background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 	line-height: 1;
 	text-transform: uppercase;
 	margin: 0;
 	letter-spacing: 0.1em;
-}
-
-.hero-home__solid-text {
-	font-size: clamp(32px, 8vw, 84px);
-	font-weight: 800;
-	color: #fff;
-	line-height: 0.5;
-	text-transform: uppercase;
-	margin: 0;
-	letter-spacing: 0.05em;
-	padding: 1px 20px;
-	backdrop-filter: blur(4px);
+	text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .hero-tagline {
@@ -1213,33 +1246,6 @@ select {
 	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 900px) {
-	.hero-home {
-		min-height: 80vh;
-		padding: 20px;
-		background-position: center bottom;
-	}
-
-	.hero-home__content {
-		padding-top: 60px;
-	}
-
-	.hero-home__top-right {
-		top: 10%;
-		right: 5%;
-	}
-
-	.hero-home__bottom-right {
-		bottom: 8%;
-		right: 5%;
-	}
-
-	.hero-home__outline-text,
-	.hero-home__solid-text {
-		font-size: clamp(32px, 12vw, 56px);
-		line-height: 1;
-	}
-}
 
 /* Update navigation and footer to feel more premium */
 .header {
