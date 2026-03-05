@@ -5,7 +5,7 @@ export default function Contact() {
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
             <h1 className="history-hero__title">Get In Touch</h1>
-            
+
           </div>
         </div>
       </section>

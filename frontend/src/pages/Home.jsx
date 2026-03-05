@@ -3,7 +3,7 @@ export default function Home() {
     <main className="home-page">
       <section
         className="hero-home"
-        style={{ backgroundImage: "url('/assets/infrastructure/main.png')" }}
+        style={{ backgroundImage: "url('/assets/infrastructure/man.png')" }}
       >
 
         <div className="hero-home__content">
@@ -24,17 +24,17 @@ export default function Home() {
         <h2>Our Core Specialization</h2>
         <div className="grid">
           <div className="card">
-            <img src="/assets/products/basic_tshirt.jpg" alt="Basic T-Shirts" />
+            <img src="/assets/infrastructure/f5.jpg" alt="Basic T-Shirts" />
             <h3>Basic T-Shirts</h3>
             <p>Premium cotton basics for everyday comfort.</p>
           </div>
           <div className="card">
-            <img src="/assets/products/premium_polo.jpg" alt="Premium Polos" />
+            <img src="/assets/infrastructure/f4.avif" alt="Premium Polos" />
             <h3>Premium Polos</h3>
             <p>Refined pique knits for a professional look.</p>
           </div>
           <div className="card">
-            <img src="/assets/products/casual_shirt.jpg" alt="Casual Shirts" />
+            <img src="/assets/infrastructure/f6.jpg" alt="Casual Shirts" />
             <h3>Casual Shirts</h3>
             <p>Stylish linen and cotton shirts for any occasion.</p>
           </div>

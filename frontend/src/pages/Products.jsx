@@ -46,7 +46,7 @@ export default function Products() {
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
             <h1 className="history-hero__title">Our Products</h1>
-            </div>
+          </div>
         </div>
       </section>
 

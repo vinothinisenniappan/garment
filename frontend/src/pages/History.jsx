@@ -41,8 +41,10 @@ export default function History() {
                     <div className="history-hero__text-group">
                         <div className="history-hero__tagline">Dressing The Future</div>
                         <h1 className="history-hero__title">Since 1997</h1>
+                        <p className="history-hero__description">
+                            A legacy built on quality, transparency, and innovation. From our humble beginnings to becoming a leading garment export house, discover the milestones that define Sree Anjaneya Exports.
+                        </p>
                     </div>
-
                 </div>
             </section>
 
