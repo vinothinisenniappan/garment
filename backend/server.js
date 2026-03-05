@@ -45,8 +45,10 @@ app.use(session({
 // API Routes
 app.use('/api/products', require('./routes/api/products'));
 app.use('/api/inquiry', require('./routes/api/inquiry'));
+app.use('/inquiry', require('./routes/inquiry'));
 app.use('/api/samples', require('./routes/api/samples'));
 app.use('/api/admin', require('./routes/api/admin'));
+app.use('/api/user', require('./routes/api/user'));
 
 // Health check
 app.get('/api/health', (req, res) => {

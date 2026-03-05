@@ -20,17 +20,22 @@ exports.login = async (req, res) => {
         errors: errors.array()
       });
     }
-    
+
     const { username, password } = req.body;
-    const admin = await Admin.findOne({ username: username.toLowerCase() });
-    
+    const admin = await Admin.findOne({
+      $or: [
+        { username: username.toLowerCase() },
+        { email: username.toLowerCase() }
+      ]
+    });
+
     if (!admin) {
       return res.status(401).json({
         success: false,
         message: 'Invalid username or password'
       });
     }
-    
+
     const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -38,10 +43,10 @@ exports.login = async (req, res) => {
         message: 'Invalid username or password'
       });
     }
-    
+
     req.session.adminId = admin._id;
     req.session.adminUsername = admin.username;
-    
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -99,25 +104,73 @@ exports.checkAuth = (req, res) => {
 // Get dashboard stats
 exports.getDashboard = async (req, res) => {
   try {
-    const stats = {
-      totalProducts: await Product.countDocuments({ isActive: true }),
-      totalBuyers: await Buyer.countDocuments(),
-      totalSamples: await SampleRequest.countDocuments(),
-      pendingSamples: await SampleRequest.countDocuments({ status: 'Requested' }),
-      newInquiries: await Buyer.countDocuments({ status: 'New' })
-    };
-    
-    const recentBuyers = await Buyer.find().sort({ submittedAt: -1 }).limit(5);
-    const recentSamples = await SampleRequest.find()
-      .populate('productId', 'name')
-      .sort({ requestedAt: -1 })
-      .limit(5);
-    
+    const now = new Date();
+    const last7Days = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+    const prev7Days = new Date(last7Days.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+    // Basic Counts
+    const totalProducts = await Product.countDocuments({ isActive: true });
+    const totalBuyers = await Buyer.countDocuments();
+    const totalSamples = await SampleRequest.countDocuments();
+    const pendingSamples = await SampleRequest.countDocuments({ status: 'Requested' });
+    const newInquiries = await Buyer.countDocuments({ status: 'New' });
+
+    // Growth Calculations (Last 7 days vs Previous 7 days)
+    const current7DaysInquiries = await Buyer.countDocuments({ submittedAt: { $gte: last7Days } });
+    const prev7DaysInquiries = await Buyer.countDocuments({ submittedAt: { $gte: prev7Days, $lt: last7Days } });
+    const inquiryTrend = prev7DaysInquiries === 0 ? (current7DaysInquiries > 0 ? '+100%' : '0%') : `${Math.round(((current7DaysInquiries - prev7DaysInquiries) / prev7DaysInquiries) * 100)}%`;
+
+    // Engagement Rate (Non-New Buyers / Total Buyers)
+    const engagedBuyers = await Buyer.countDocuments({ status: { $ne: 'New' } });
+    const engagementRate = totalBuyers === 0 ? 0 : Math.round((engagedBuyers / totalBuyers) * 100);
+
+    // 7-Day Trend for Chart
+    // Normalize now to the end of today and last7Days to start of 7 days ago
+    const startOfToday = new Date(now);
+    startOfToday.setHours(23, 59, 59, 999);
+
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailyInquiries = await Buyer.aggregate([
+      { $match: { submittedAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$submittedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    // Map to last 7 days array to ensure all days are represented
+    const trendData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const found = dailyInquiries.find(item => item._id === dateStr);
+      trendData.push(found ? found.count : 0);
+    }
+
+    const recentBuyers = await Buyer.find().sort({ submittedAt: -1 }).limit(10);
+    const products = await Product.find().sort({ createdAt: -1 }).limit(10);
+
     res.json({
       success: true,
-      stats,
+      stats: {
+        totalProducts,
+        totalBuyers,
+        totalSamples,
+        pendingSamples,
+        newInquiries,
+        engagementRate,
+        inquiryTrend,
+        trendData
+      },
       recentBuyers,
-      recentSamples
+      products
     });
   } catch (error) {
     console.error('Error loading dashboard:', error);
@@ -213,7 +266,7 @@ exports.addProduct = async (req, res) => {
         errors: errors.array()
       });
     }
-    
+
     // Handle image URLs - split by newline if it's a string
     let images = [];
     if (req.body.images) {
@@ -223,7 +276,7 @@ exports.addProduct = async (req, res) => {
         images = req.body.images.filter(img => img.trim());
       }
     }
-    
+
     const productData = {
       name: req.body.name,
       category: req.body.category,
@@ -233,10 +286,10 @@ exports.addProduct = async (req, res) => {
       sizeRange: req.body.sizeRange,
       images: images
     };
-    
+
     const product = new Product(productData);
     await product.save();
-    
+
     res.json({
       success: true,
       message: 'Product added successfully',
@@ -262,7 +315,7 @@ exports.updateProduct = async (req, res) => {
         errors: errors.array()
       });
     }
-    
+
     // Handle image URLs
     let images = [];
     if (req.body.images) {
@@ -272,7 +325,7 @@ exports.updateProduct = async (req, res) => {
         images = req.body.images.filter(img => img.trim());
       }
     }
-    
+
     const productData = {
       name: req.body.name,
       category: req.body.category,
@@ -283,7 +336,7 @@ exports.updateProduct = async (req, res) => {
       images: images,
       isActive: req.body.isActive !== undefined ? req.body.isActive : true
     };
-    
+
     const product = await Product.findByIdAndUpdate(req.params.id, productData, { new: true });
     if (!product) {
       return res.status(404).json({
@@ -291,7 +344,7 @@ exports.updateProduct = async (req, res) => {
         message: 'Product not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Product updated successfully',
@@ -357,11 +410,11 @@ exports.getBuyer = async (req, res) => {
         message: 'Buyer not found'
       });
     }
-    
+
     const sampleRequests = await SampleRequest.find({ buyerId: buyer._id })
       .populate('productId', 'name category')
       .sort({ requestedAt: -1 });
-    
+
     res.json({
       success: true,
       buyer,
@@ -385,14 +438,14 @@ exports.updateBuyerStatus = async (req, res) => {
       { status, notes },
       { new: true }
     );
-    
+
     if (!buyer) {
       return res.status(404).json({
         success: false,
         message: 'Buyer not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Buyer status updated successfully',
@@ -415,7 +468,7 @@ exports.getSamples = async (req, res) => {
       .populate('productId', 'name category')
       .populate('buyerId', 'companyName email')
       .sort({ requestedAt: -1 });
-    
+
     res.json({
       success: true,
       samples
@@ -434,28 +487,28 @@ exports.updateSampleStatus = async (req, res) => {
   try {
     const { status, trackingNumber, notes } = req.body;
     const updateData = { status, notes };
-    
+
     if (trackingNumber) {
       updateData.trackingNumber = trackingNumber;
     }
-    
+
     if (status === 'Dispatched') {
       updateData.dispatchedAt = Date.now();
     }
-    
+
     const sampleRequest = await SampleRequest.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true }
     );
-    
+
     if (!sampleRequest) {
       return res.status(404).json({
         success: false,
         message: 'Sample request not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Sample status updated successfully',

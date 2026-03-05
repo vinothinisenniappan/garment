@@ -1,12 +1,44 @@
+import { useEffect, useMemo, useState } from 'react'
+import { apiFetch } from '../lib/api'
+
 export default function Products() {
-  const products = [
-    { name: 'Classic Tee', tags: ['Cotton', 'Unisex'], price: '$8.50', image: '/assets/infrastructure/i1.jpeg' },
-    { name: 'Premium Polo', tags: ['Piqué', 'Men'], price: '$12.90', image: '/assets/infrastructure/i2.jpeg' },
-    { name: 'Athletic Hoodie', tags: ['Fleece', 'Unisex'], price: '$18.40', image: '/assets/infrastructure/i3.jpeg' },
-    { name: 'Crewneck Sweatshirt', tags: ['Terry', 'Unisex'], price: '$15.75', image: '/assets/infrastructure/i4.jpeg' },
-    { name: 'Performance Joggers', tags: ['Activewear'], price: '$17.20', image: '/assets/infrastructure/i5.jpeg' },
-    { name: 'Outerwear Jacket', tags: ['Shell'], price: '$22.00', image: '/assets/infrastructure/main.png' },
-  ];
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState(['All'])
+  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true)
+        setError('')
+        const data = await apiFetch('/api/products')
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to load products')
+        }
+
+        setProducts(Array.isArray(data.products) ? data.products : [])
+        const backendCategories = Array.isArray(data.categories) ? data.categories : []
+        setCategories(['All', ...backendCategories])
+      } catch (err) {
+        setError(err.message || 'Failed to load products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === 'All') {
+      return products
+    }
+
+    return products.filter((product) => product.category === selectedCategory)
+  }, [products, selectedCategory])
 
   return (
     <main className="products-page">
@@ -22,8 +54,21 @@ export default function Products() {
         <section style={{ marginBottom: '20px' }}>
           <div className="pro-card" style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              {['All', 'T-Shirts', 'Polos', 'Activewear', 'Outerwear'].map(cat => (
-                <button key={cat} className="pro-button" style={{ padding: '10px 18px', background: 'transparent', color: 'var(--nav-bg)', border: '1px solid var(--nav-bg)' }}>{cat}</button>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  className="pro-button"
+                  style={{
+                    padding: '10px 18px',
+                    background: selectedCategory === cat ? 'var(--nav-bg)' : 'transparent',
+                    color: selectedCategory === cat ? 'white' : 'var(--nav-bg)',
+                    border: '1px solid var(--nav-bg)'
+                  }}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
               ))}
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -38,12 +83,17 @@ export default function Products() {
         </section>
 
         <section>
+          {error && <p style={{ color: 'crimson', marginBottom: '12px' }}>{error}</p>}
           <div className="grid grid--three">
-            {products.map((p) => (
-              <div key={p.name} className="pro-card product-card">
+            {loading ? (
+              <p style={{ color: 'var(--muted)' }}>Loading products...</p>
+            ) : filteredProducts.length === 0 ? (
+              <p style={{ color: 'var(--muted)' }}>No products available.</p>
+            ) : filteredProducts.map((p) => (
+              <div key={p._id || p.name} className="pro-card product-card">
                 <div className="product-card__image">
-                  {p.image ? (
-                    <img src={p.image} alt={p.name} />
+                  {p.images?.[0] ? (
+                    <img src={p.images[0]} alt={p.name} />
                   ) : (
                     <div className="product-card__placeholder">Image coming soon</div>
                   )}
@@ -51,12 +101,12 @@ export default function Products() {
                 <div className="product-card__info">
                   <h3 style={{ margin: '8px 0 6px' }}>{p.name}</h3>
                   <div className="product-card__tags">
-                    {p.tags.map(tag => (
+                    {[p.category, p.fabricType, p.gsm].filter(Boolean).map(tag => (
                       <span key={tag} className="product-tag">{tag}</span>
                     ))}
                   </div>
                   <div className="product-card__meta">
-                    <span className="product-price">{p.price}</span>
+                    <span className="product-price">{p.sizeRange || 'Available sizes on request'}</span>
                     <button className="pro-button" style={{ padding: '10px 16px' }}>Details</button>
                   </div>
                 </div>

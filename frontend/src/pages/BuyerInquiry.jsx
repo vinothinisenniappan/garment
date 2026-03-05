@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiFetch } from '../lib/api'
 
 export default function BuyerInquiry() {
   const [submitted, setSubmitted] = useState(false)
@@ -60,17 +61,11 @@ export default function BuyerInquiry() {
     }
 
     try {
-      const res = await fetch('/api/inquiry', {
+      const data = await apiFetch('/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-      const ct = res.headers.get('content-type') || ''
-      if (!ct.includes('application/json')) {
-        const txt = await res.text()
-        throw new Error(`Non-JSON response (${res.status}): ${txt.slice(0, 80)}...`)
-      }
-      const data = await res.json()
       if (!data.success) {
         throw new Error(data.message || 'Submission failed')
       }

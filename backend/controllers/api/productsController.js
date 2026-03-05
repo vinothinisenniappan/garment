@@ -10,24 +10,26 @@ exports.getProducts = async (req, res) => {
   try {
     const { category } = req.query;
     const query = { isActive: true };
-    
+
     if (category && category !== 'All') {
       query.category = category;
     }
-    
+
     const products = await Product.find(query).sort({ createdAt: -1 });
-    
+    console.log(`Successfully fetched ${products.length} products`);
+
     res.json({
       success: true,
       products,
-      categories: ['T-shirts', 'Gents Wear', 'Ladies Wear', 'Kids Wear']
+      categories: ['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear']
     });
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching products',
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
   }
 };
@@ -36,14 +38,14 @@ exports.getProducts = async (req, res) => {
 exports.getProductDetails = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    
+
     if (!product || !product.isActive) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
-    
+
     res.json({
       success: true,
       product
@@ -65,7 +67,7 @@ exports.getFeaturedProducts = async (req, res) => {
       { $match: { isActive: true } },
       { $sample: { size: 4 } }
     ]);
-    
+
     res.json({
       success: true,
       products: featuredProducts

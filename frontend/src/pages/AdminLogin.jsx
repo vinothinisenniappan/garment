@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiFetch } from '../lib/api'
 
 export default function AdminLogin() {
   const [adminId, setAdminId] = useState('')
@@ -7,17 +8,26 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (adminId.trim().toLowerCase() === 'vinothinis.23it@kongu.edu' && pass === '123456') {
-      setError('')
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('adminAuth', 'true')
-        window.localStorage.setItem('adminId', adminId.trim())
+    try {
+      const data = await apiFetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: adminId.trim().toLowerCase(),
+          password: pass
+        })
+      })
+
+      if (!data.success) {
+        throw new Error(data.message || 'Login failed')
       }
+
+      setError('')
       navigate('/admin')
-    } else {
-      setError('Invalid Administrator ID or Passphrase')
+    } catch (err) {
+      setError(err.message || 'Invalid Administrator ID or Passphrase')
     }
   }
 
@@ -72,6 +82,23 @@ export default function AdminLogin() {
           </form>
 
           <footer className="admin-login-footer">
+            <button
+              className="admin-login-back-btn"
+              onClick={() => navigate('/')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                cursor: 'pointer',
+                fontSize: '14px',
+                marginBottom: '10px',
+                display: 'block',
+                width: '100%',
+                textAlign: 'center'
+              }}
+            >
+              ← Back to Home Page
+            </button>
             <p>© 2026 Admin Control System</p>
             <span>Protected by enterprise-level encryption</span>
           </footer>

@@ -10,14 +10,18 @@ import BuyerInquiry from './pages/BuyerInquiry'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import RequireAuth from './components/RequireAuth'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import Infrastructure from './pages/Infrastructure'
 import History from './pages/History'
 import Products from './pages/Products'
 
+import UserLogin from './pages/UserLogin'
+import UserRegister from './pages/UserRegister'
+
 export default function App() {
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const { loading } = useAuth();
   const [theme, setTheme] = useState(() => {
     const saved = typeof window !== 'undefined' ? window.localStorage.getItem('theme') : null;
     return saved === 'dark' ? 'dark' : 'light';
@@ -32,23 +36,27 @@ export default function App() {
 
   const isAdmin = location.pathname.startsWith('/admin');
 
+  if (loading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
   return (
-    <AuthProvider>
-      <div className={isHome ? 'app app--home' : 'app app--internal'}>
-        {!isAdmin && <Header theme={theme} onToggleTheme={toggleTheme} />}
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/buyer-inquiry" element={<BuyerInquiry />} />
-          <Route path="/infrastructure" element={<Infrastructure />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
-        </Routes>
-        {!isAdmin && <Footer />}
-      </div>
-    </AuthProvider>
+    <div className={isHome ? 'app app--home' : 'app app--internal'}>
+      {!isAdmin && <Header theme={theme} onToggleTheme={toggleTheme} />}
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/buyer-inquiry" element={<BuyerInquiry />} />
+        <Route path="/infrastructure" element={<Infrastructure />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/login" element={<UserLogin />} />
+        <Route path="/register" element={<UserRegister />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
+      </Routes>
+      {!isAdmin && <Footer />}
+    </div>
   )
 }

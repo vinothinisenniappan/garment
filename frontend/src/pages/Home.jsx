@@ -24,26 +24,21 @@ export default function Home() {
         <h2>Our Core Specialization</h2>
         <div className="grid">
           <div className="card">
-            <img src="/assets/infrastructure/f4.avif" alt="T-Shirts" />
+            <img src="/assets/products/basic_tshirt.jpg" alt="Basic T-Shirts" />
             <h3>Basic T-Shirts</h3>
-            <p>High-quality hosiery cotton basics.</p>
+            <p>Premium cotton basics for everyday comfort.</p>
           </div>
           <div className="card">
-            <img src="/assets/infrastructure/f6.jpg" alt="Polo Shirts" />
+            <img src="/assets/products/premium_polo.jpg" alt="Premium Polos" />
             <h3>Premium Polos</h3>
-            <p>Refined knits for global markets.</p>
+            <p>Refined pique knits for a professional look.</p>
           </div>
           <div className="card">
-            <img src="/assets/infrastructure/f8.jpg" alt="Activewear" />
-            <h3>Activewear</h3>
-            <p>Performance fabrics and precise stitching.</p>
+            <img src="/assets/products/casual_shirt.jpg" alt="Casual Shirts" />
+            <h3>Casual Shirts</h3>
+            <p>Stylish linen and cotton shirts for any occasion.</p>
           </div>
-
-
-
         </div>
-
-
       </section>
 
       <section className="certifications">

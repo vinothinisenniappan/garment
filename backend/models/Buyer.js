@@ -65,11 +65,36 @@ const buyerSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: 6
+  },
   submittedAt: {
     type: Date,
     default: Date.now
   }
 });
+
+// Hash password before saving
+buyerSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  try {
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
+buyerSchema.methods.comparePassword = async function (candidatePassword) {
+  const bcrypt = require('bcryptjs');
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports = mongoose.model('Buyer', buyerSchema);
 

@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['T-shirts', 'Gents Wear', 'Ladies Wear', 'Kids Wear'],
+    enum: ['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear'],
     trim: true
   },
   description: {
@@ -55,7 +55,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Update the updatedAt field before saving
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });

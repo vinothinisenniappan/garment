@@ -5,6 +5,7 @@
 
 const Buyer = require('../../models/Buyer');
 const { validationResult } = require('express-validator');
+const { sendInquiryNotificationEmail } = require('../../utils/mailer');
 
 // Submit inquiry form
 exports.submitInquiry = async (req, res) => {
@@ -43,16 +44,50 @@ exports.submitInquiry = async (req, res) => {
     if (io) {
       io.emit('new-inquiry', {
         id: buyer._id,
+        message: `${buyer.contactPerson} of the buyer placed an order.`,
+        buyerName: buyer.contactPerson,
+        companyName: buyer.companyName,
         contactPerson: buyer.contactPerson,
         email: buyer.email,
         submittedAt: buyer.submittedAt
       });
     }
 
+    let emailNotification = { success: false, skipped: true };
+    try {
+      const mailResult = await sendInquiryNotificationEmail({
+        buyerName: buyer.contactPerson,
+        companyName: buyer.companyName,
+        buyerEmail: buyer.email,
+        country: buyer.country
+      });
+
+      emailNotification = {
+        success: !mailResult.skipped,
+        skipped: mailResult.skipped,
+        reason: mailResult.reason,
+        accepted: mailResult.accepted,
+        rejected: mailResult.rejected,
+        messageId: mailResult.messageId
+      };
+
+      if (!mailResult.skipped) {
+        console.log(`Inquiry email sent. Message ID: ${mailResult.messageId}`);
+      }
+    } catch (mailError) {
+      emailNotification = {
+        success: false,
+        skipped: false,
+        error: mailError.message
+      };
+      console.error('Inquiry email notification failed:', mailError.message);
+    }
+
     res.json({
       success: true,
       message: 'Inquiry submitted successfully',
-      buyerId: buyer._id
+      buyerId: buyer._id,
+      emailNotification
     });
   } catch (error) {
     console.error('Error submitting inquiry:', error);

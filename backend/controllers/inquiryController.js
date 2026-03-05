@@ -5,6 +5,7 @@
 
 const Buyer = require('../models/Buyer');
 const { validationResult } = require('express-validator');
+const { sendInquiryNotificationEmail } = require('../utils/mailer');
 
 // Render inquiry form
 exports.getInquiryForm = (req, res) => {
@@ -28,7 +29,7 @@ exports.submitInquiry = async (req, res) => {
         error: 'Please correct the errors below'
       });
     }
-    
+
     const buyerData = {
       companyName: req.body.companyName,
       contactPerson: req.body.contactPerson,
@@ -40,14 +41,27 @@ exports.submitInquiry = async (req, res) => {
       businessType: req.body.businessType,
       requirements: req.body.requirements,
       annualVolume: req.body.annualVolume,
-      preferredCategories: Array.isArray(req.body.preferredCategories) 
-        ? req.body.preferredCategories 
+      preferredCategories: Array.isArray(req.body.preferredCategories)
+        ? req.body.preferredCategories
         : req.body.preferredCategories ? [req.body.preferredCategories] : []
     };
-    
+
     const buyer = new Buyer(buyerData);
     await buyer.save();
-    
+
+    // Send email notification
+    try {
+      await sendInquiryNotificationEmail({
+        buyerName: buyer.contactPerson,
+        companyName: buyer.companyName,
+        buyerEmail: buyer.email,
+        country: buyer.country
+      });
+      console.log(`Inquiry email sent for ${buyer.contactPerson}`);
+    } catch (mailError) {
+      console.error('Inquiry email notification failed:', mailError.message);
+    }
+
     res.render('inquiry-success', {
       title: 'Inquiry Submitted',
       message: 'Thank you for your inquiry. We will contact you soon!'
