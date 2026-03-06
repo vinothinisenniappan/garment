@@ -53,8 +53,8 @@ export default function Products() {
 
       <div className="page-container" style={{ marginBottom: '80px' }}>
         <section style={{ marginBottom: '20px' }}>
-          <div className="pro-card" style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div className="pro-card product-filters">
+            <div className="product-categories">
               {categories.map(cat => (
                 <button
                   key={cat}
@@ -72,8 +72,8 @@ export default function Products() {
                 </button>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <select className="pro-input" style={{ width: '180px' }}>
+            <div className="product-sort">
+              <select className="pro-input">
                 <option>Sort by: Popular</option>
                 <option>Sort by: Newest</option>
                 <option>Sort by: Price (Low)</option>
