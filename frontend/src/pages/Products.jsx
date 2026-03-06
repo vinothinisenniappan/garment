@@ -42,10 +42,11 @@ export default function Products() {
 
   return (
     <main className="products-page">
-      <section className="history-hero">
+      <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/t.png')" }}>
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
-            <h1 className="history-hero__title">Our Products</h1>
+            <div className="history-hero__tagline">Quality Beyond Measure</div>
+            <h1 className="history-hero__title">Our Collections</h1>
           </div>
         </div>
       </section>

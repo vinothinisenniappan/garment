@@ -8,11 +8,11 @@ export default function Infrastructure() {
 
   return (
     <main className="infrastructure-page">
-      <section className="history-hero">
+      <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/1.jpg')" }}>
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
-            <h1 className="history-hero__title">Manufacturing Infrastructure</h1>
-
+            <div className="history-hero__tagline">Dressing The Future</div>
+            <h1 className="history-hero__title">Our Infrastructure</h1>
           </div>
         </div>
       </section>

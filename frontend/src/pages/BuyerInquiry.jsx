@@ -77,11 +77,12 @@ export default function BuyerInquiry() {
 
   return (
     <main className="inquiry-page">
-      <section className="history-hero">
+      <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/an.webp')" }}>
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
-            <h1 className="history-hero__title">Buyer Inquiry</h1>
-            </div>
+            <div className="history-hero__tagline">Tailored Solutions for Your Brand</div>
+            <h1 className="history-hero__title">Business Inquiries</h1>
+          </div>
         </div>
       </section>
 

@@ -1,11 +1,11 @@
 export default function Contact() {
   return (
     <main className="contact-page">
-      <section className="history-hero">
+      <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/r.avif')" }}>
         <div className="history-hero__inner">
           <div className="history-hero__text-group">
-            <h1 className="history-hero__title">Get In Touch</h1>
-
+            <div className="history-hero__tagline">Always Within Reach</div>
+            <h1 className="history-hero__title">Contact Us</h1>
           </div>
         </div>
       </section>
