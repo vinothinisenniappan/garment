@@ -17,6 +17,11 @@ import Products from './pages/Products'
 
 import UserLogin from './pages/UserLogin'
 import UserRegister from './pages/UserRegister'
+import LiveCapacity from './pages/LiveCapacity'
+import Traceability from './pages/Traceability'
+import TechPackBuilder from './pages/TechPackBuilder'
+import Partnership from './pages/Partnership'
+import QualityPolicy from './pages/QualityPolicy'
 
 export default function App() {
   const location = useLocation();
@@ -53,6 +58,11 @@ export default function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/register" element={<UserRegister />} />
+        <Route path="/live-capacity" element={<LiveCapacity />} />
+        <Route path="/traceability" element={<Traceability />} />
+        <Route path="/tech-pack-builder" element={<TechPackBuilder />} />
+        <Route path="/partnership" element={<Partnership />} />
+        <Route path="/quality-policy" element={<QualityPolicy />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
       </Routes>

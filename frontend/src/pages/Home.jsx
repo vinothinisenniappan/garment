@@ -1,21 +1,18 @@
 export default function Home() {
   return (
     <main className="home-page">
-      <section
-        className="hero-home"
-        style={{ backgroundImage: "url('/assets/infrastructure/man.png')" }}
-      >
-
+      <section className="hero-home">
+        <div className="hero-home__overlay"></div>
         <div className="hero-home__content">
-          <div className="hero-home__top-right">
-            <h1 className="hero-home__outline-text">
-              SREE<br />ANJANEYA
-            </h1>
-          </div>
-          <div className="hero-home__bottom-right">
-            <h1 className="hero-home__solid-text">
-              EXPORTS
-            </h1>
+          <h1 className="hero-home__title">
+            PRECISION IN EVERY STITCH
+          </h1>
+          <p className="hero-home__description">
+            Partnering with global brands to deliver excellence in sustainable garment production.
+          </p>
+          <div className="hero-home__actions">
+            <a href="/products" className="hero-btn hero-btn--primary">Shop Collections</a>
+            <a href="/buyer-inquiry" className="hero-btn hero-btn--secondary">Partner with Us</a>
           </div>
         </div>
       </section>

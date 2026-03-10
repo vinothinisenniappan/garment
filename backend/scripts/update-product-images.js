@@ -7,7 +7,6 @@ const updateProducts = async () => {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/garment-export');
         console.log('Connected to MongoDB');
 
-        // 1. Update existing products
         await Product.findOneAndUpdate(
             { name: /Classic French Terry Hoodie/i },
             {
@@ -17,7 +16,7 @@ const updateProducts = async () => {
                 images: ['/assets/products/d1.webp'],
                 fabricType: 'Organic Cotton',
                 gsm: '180'
-            }
+            }c
         );
 
         await Product.findOneAndUpdate(
@@ -36,14 +35,13 @@ const updateProducts = async () => {
             { name: /Sustainable Organic Cotton Tee/i },
             {
                 name: 'Essential White Vest',
-                category: 'T-shirts', // Assuming Vest belongs here or we could add a new category
+                category: 'T-shirts', 
                 images: ['/assets/products/mens_vest.png'],
                 fabricType: 'Ribbed Cotton',
                 gsm: '140'
             }
         );
 
-        // 2. Add new products
         const newProducts = [
             {
                 name: 'Kids Comfort Night Dress',

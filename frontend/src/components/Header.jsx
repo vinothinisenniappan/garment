@@ -40,81 +40,102 @@ export default function Header() {
   const headerClass = `header ${isHome
     ? (!isScrolled ? 'header--transparent' : 'header--scrolled')
     : `header--internal ${isScrolled ? 'header--scrolled' : ''}`
-    }`;
+    } ${isHome ? 'header--on-home' : ''}`;
 
   return (
-    <header className={headerClass}>
-      <div className="header-inner">
-        <Link to="/" className="brand">SREE ANJANEYA EXPORTS</Link>
-        <nav className="nav">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/history" className="nav-link">History</Link>
-          <Link to="/contact" className="nav-link">Contact</Link>
-          <Link to="/buyer-inquiry" className="nav-link">Buyer Inquiry</Link>
-
-          {user ? (
-            <div className="profile-container">
-              <button
-                className="profile-trigger"
-                onClick={() => setProfileOpen(!profileOpen)}
-                aria-label="User profile"
-              >
-                <div className="profile-icon-wrapper">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+    <>
+      <header className={headerClass} style={{ top: '0' }}>
+        <div className="header-inner">
+          <Link to="/" className="brand">SREE ANJANEYA EXPORTS</Link>
+          <nav className="nav">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/products" className="nav-link">Products</Link>
+            <Link to="/partnership" className="nav-link">Partnership</Link>
+            {user && (
+              <div className="nav-link dropdown-hover" style={{ position: 'relative', cursor: 'pointer' }}>
+                Tools ▾
+                <div className="dropdown-menu glassmorphic" style={{ position: 'absolute', top: '100%', left: 0, minWidth: '180px', display: 'none', flexDirection: 'column', gap: '8px', padding: '10px', zIndex: 10 }}>
+                  <Link to="/live-capacity" style={{ color: '#fff', textDecoration: 'none', padding: '5px', fontSize: '14px', whiteSpace: 'nowrap' }}>Capacity Planner</Link>
+                  <Link to="/traceability" style={{ color: '#fff', textDecoration: 'none', padding: '5px', fontSize: '14px', whiteSpace: 'nowrap' }}>Traceability Map</Link>
+                  <Link to="/tech-pack-builder" style={{ color: '#fff', textDecoration: 'none', padding: '5px', fontSize: '14px', whiteSpace: 'nowrap' }}>Tech-Pack Builder</Link>
                 </div>
-              </button>
+              </div>
+            )}
+            <style>{`
+            .dropdown-hover:hover .dropdown-menu { display: flex !important; }
+            .dropdown-menu a:hover { color: var(--accent) !important; }
+          `}</style>
+            <Link to="/buyer-inquiry" className="nav-link">Buyer Inquiry</Link>
 
-              {profileOpen && (
-                <div className="profile-dropdown glassmorphic">
-                  <div className="dropdown-header">
-                    <p className="user-name">{user.contactPerson}</p>
-                    <p className="user-email">{user.email}</p>
+            {user ? (
+              <div className="profile-container">
+                <button
+                  className="profile-trigger"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  aria-label="User profile"
+                >
+                  <div className="profile-icon-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
                   </div>
-                  <div className="dropdown-divider"></div>
-                  <Link to="/products" className="dropdown-item">View Products</Link>
-                  <button onClick={() => logout()} className="dropdown-item logout-item">Logout</button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link to="/login" className="nav-link auth-link">Login</Link>
-          )}
-        </nav>
-        <button aria-label="Open menu" className="nav-menu-icon" onClick={() => setMenuOpen(v => !v)}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-      <div className={`nav-overlay ${menuOpen ? 'is-open' : ''}`} onClick={() => setMenuOpen(false)}>
-        <div className="nav-overlay__content">
-          <div className="nav-overlay__panel" onClick={(e) => e.stopPropagation()}>
-            <button className="nav-overlay__close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>×</button>
-            <div className="nav-overlay__title">Explore</div>
-            <div className="nav-overlay__links">
-              <Link to="/" className="nav-overlay__link">Home</Link>
-              <Link to="/history" className="nav-overlay__link">History</Link>
-              <Link to="/products" className="nav-overlay__link">Products</Link>
-              <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
-              <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
-              <Link to="/contact" className="nav-overlay__link">Contact</Link>
-              {user ? (
-                <>
-                  <div className="nav-overlay__divider"></div>
-                  <p className="nav-overlay__user-info">Logged in as {user.contactPerson}</p>
-                  <button onClick={() => logout()} className="nav-overlay__link" style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: '#dc2626' }}>Logout</button>
-                </>
-              ) : (
-                <Link to="/login" className="nav-overlay__link">Login</Link>
-              )}
+                </button>
+
+                {profileOpen && (
+                  <div className="profile-dropdown glassmorphic">
+                    <div className="dropdown-header">
+                      <p className="user-name">{user.contactPerson}</p>
+                      <p className="user-email">{user.email}</p>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <Link to="/products" className="dropdown-item">View Products</Link>
+                    <button onClick={() => logout()} className="dropdown-item logout-item">Logout</button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="nav-link auth-link">Login</Link>
+            )}
+          </nav>
+          <button aria-label="Open menu" className="nav-menu-icon" onClick={() => setMenuOpen(v => !v)}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+        <div className={`nav-overlay ${menuOpen ? 'is-open' : ''}`} onClick={() => setMenuOpen(false)}>
+          <div className="nav-overlay__content">
+            <div className="nav-overlay__panel" onClick={(e) => e.stopPropagation()}>
+              <button className="nav-overlay__close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>×</button>
+              <div className="nav-overlay__title">Explore</div>
+              <div className="nav-overlay__links">
+                <Link to="/" className="nav-overlay__link">Home</Link>
+                <Link to="/history" className="nav-overlay__link">History</Link>
+                <Link to="/products" className="nav-overlay__link">Products</Link>
+                <Link to="/partnership" className="nav-overlay__link">Partnership</Link>
+                <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
+
+                <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
+                <Link to="/contact" className="nav-overlay__link">Contact</Link>
+                {user ? (
+                  <>
+                    <Link to="/live-capacity" className="nav-overlay__link">Capacity Planner</Link>
+                    <Link to="/traceability" className="nav-overlay__link">Traceability Map</Link>
+                    <Link to="/tech-pack-builder" className="nav-overlay__link">Tech-Pack Builder</Link>
+                    <div className="nav-overlay__divider"></div>
+                    <p className="nav-overlay__user-info">Logged in as {user.contactPerson}</p>
+                    <button onClick={() => logout()} className="nav-overlay__link" style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: '#dc2626' }}>Logout</button>
+                  </>
+                ) : (
+                  <Link to="/login" className="nav-overlay__link">Login</Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   )
 }
 

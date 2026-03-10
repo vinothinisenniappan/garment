@@ -19,6 +19,7 @@ export default function Footer() {
               <li><Link to="/infrastructure">Infrastructure</Link></li>
               <li><Link to="/history">History</Link></li>
               <li><Link to="/products">Products</Link></li>
+              <li><Link to="/partnership">Partnership</Link></li>
               <li><Link to="/buyer-inquiry">Buyer Inquiry</Link></li>
               <li><Link to="/contact">Contact Us</Link></li>
             </ul>
@@ -29,7 +30,7 @@ export default function Footer() {
             <ul>
               <li><a href="#">Privacy Policy</a></li>
               <li><a href="#">Compliance</a></li>
-              <li><a href="#">Quality Policy</a></li>
+              <li><Link to="/quality-policy">Quality Policy</Link></li>
             </ul>
           </nav>
 
