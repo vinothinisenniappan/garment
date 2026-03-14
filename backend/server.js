@@ -47,8 +47,11 @@ app.use('/api/products', require('./routes/api/products'));
 app.use('/api/inquiry', require('./routes/api/inquiry'));
 
 app.use('/api/samples', require('./routes/api/samples'));
+app.use('/api/sample-inquiries', require('./routes/api/sampleInquiries')); // New Route
 app.use('/api/admin', require('./routes/api/admin'));
 app.use('/api/user', require('./routes/api/user'));
+app.use('/api/orders', require('./routes/api/orders'));
+
 
 // Health check
 app.get('/api/health', (req, res) => {

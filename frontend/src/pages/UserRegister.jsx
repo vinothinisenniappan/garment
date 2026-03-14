@@ -44,16 +44,17 @@ export default function UserRegister() {
     }
 
     return (
-        <main className="user-auth-page">
-            <div className="auth-container register-container">
-                <div className="auth-box glassmorphic">
-                    <header className="auth-header">
-                        <h1>Create Account</h1>
-                        <p>Join our garment export network</p>
+        <main className="user-auth-page app--internal" style={{ minHeight: '100vh', padding: '60px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+            <div className="auth-container register-container" style={{ width: '100%', maxWidth: '800px' }}>
+                <div className="pro-card" style={{ padding: '50px', boxShadow: '0 20px 50px rgba(15, 23, 42, 0.1)' }}>
+                    <header className="auth-header" style={{ marginBottom: '40px', textAlign: 'center' }}>
+                        <span className="section-subtitle">Registration</span>
+                        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Create Buyer Account</h1>
+                        <p className="cap-desc">Join our global supply chain network</p>
                     </header>
 
                     <form className="pro-form" onSubmit={handleSubmit}>
-                        <div className="form-grid">
+                        <div className="grid grid--two" style={{ rowGap: '25px' }}>
                             <div className="pro-field">
                                 <label htmlFor="companyName">Company Name</label>
                                 <input
@@ -74,7 +75,7 @@ export default function UserRegister() {
                                     name="contactPerson"
                                     type="text"
                                     className="pro-input"
-                                    placeholder="Your full name"
+                                    placeholder="Full name"
                                     value={formData.contactPerson}
                                     onChange={handleChange}
                                     required
@@ -100,7 +101,7 @@ export default function UserRegister() {
                                     name="phone"
                                     type="tel"
                                     className="pro-input"
-                                    placeholder="+1 234 567 890"
+                                    placeholder="+91 98437 34959"
                                     value={formData.phone}
                                     onChange={handleChange}
                                     required
@@ -113,7 +114,7 @@ export default function UserRegister() {
                                     name="country"
                                     type="text"
                                     className="pro-input"
-                                    placeholder="Country name"
+                                    placeholder="e.g. United Kingdom"
                                     value={formData.country}
                                     onChange={handleChange}
                                     required
@@ -149,25 +150,21 @@ export default function UserRegister() {
                         </div>
 
                         {error && (
-                            <div className="auth-error-msg">
-                                <span>⚠</span> {error}
+                            <div className="error-message" style={{ color: 'var(--accent)', fontWeight: 600, margin: '25px 0', textAlign: 'center' }}>
+                                {error}
                             </div>
                         )}
 
-                        <button type="submit" className="pro-button primary-btn" disabled={loading}>
-                            <span>{loading ? 'Creating Account...' : 'Create Account'}</span>
-                            {!loading && (
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            )}
+                        <button type="submit" className="pro-button" style={{ width: '100%', height: '56px', marginTop: '30px' }} disabled={loading}>
+                            {loading ? 'Processing Registration...' : 'Register as Partner'}
                         </button>
                     </form>
 
-                    <footer className="auth-footer">
-                        <p>Already have an account? <Link to="/login">Sign In</Link></p>
+                    <footer className="auth-footer center" style={{ marginTop: '40px', paddingTop: '30px', borderTop: '1px solid var(--border)' }}>
+                        <p className="cap-desc">Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>Sign In</Link></p>
                         <button
-                            className="back-home-btn"
+                            className="filter-btn"
+                            style={{ marginTop: '20px', width: '200px' }}
                             onClick={() => navigate('/')}
                         >
                             ← Back to Home

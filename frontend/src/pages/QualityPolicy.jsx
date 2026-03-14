@@ -1,59 +1,58 @@
 import React from 'react';
+import { Microscope, Eye, Archive, ShieldAlert, TrendingUp, CheckCircle2 } from 'lucide-react';
 
 export default function QualityPolicy() {
     const qualityPoints = [
-        { title: "Stringent Material Testing", icon: "🔬", desc: "Rigorous testing of yarn and fabrics for shrinkage, color fastness, pilling, and dimensional stability before production begins." },
-        { title: "Inline Inspections", icon: "👀", desc: "Continuous monitoring during cutting, sewing, and finishing to identify and rectify defects immediately on the production line." },
-        { title: "Final Random Inspection (FRI)", icon: "📦", desc: "Comprehensive final audits conducted per international standards to guarantee that only flawless garments ship out." },
-        { title: "Safety & Compliance", icon: "🧲", desc: "Strict needle detector procedures and compliance checks to ensure all garments are safe and meet global retail standards." },
-        { title: "Continuous Training", icon: "📈", desc: "Regular skill enhancement and calibration for our quality assurance personnel to stay updated with industry best practices." }
+        { title: "Material Testing", icon: <Microscope size={24} />, desc: "Rigorous testing of yarn and fabrics for pilling, and dimensional stability before production.", color: "#6366F1" },
+        { title: "Inline Inspections", icon: <Eye size={24} />, desc: "Continuous monitoring during cutting and sewing to rectify defects immediately on the line.", color: "#38BDF8" },
+        { title: "Final Audits (FRI)", icon: <Archive size={24} />, desc: "Comprehensive final audits conducted per AQL 2.5 standards to guarantee flawless delivery.", color: "#0F2E5A" },
+        { title: "Global Compliance", icon: <ShieldAlert size={24} />, desc: "Strict needle detector procedures and compliance checks to meet global retail standards.", color: "#10B981" },
+        { title: "Skill Enhancement", icon: <TrendingUp size={24} />, desc: "Regular training and calibration for our QA personnel to stay updated with industry best practices.", color: "#F59E0B" }
     ];
 
     return (
-        <main className="quality-page">
-            <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/o.jpg')", padding: '120px 20px 60px', textAlign: 'center' }}>
-                <div className="history-hero__inner">
-                    <div className="history-hero__text-group">
-                        <div className="history-hero__tagline">Uncompromising Standards</div>
-                        <h1 className="history-hero__title">Quality Policy</h1>
-                    </div>
-                </div>
-            </section>
+    <main className="quality-page app--internal">
+      <section className="internal-hero">
+        <div className="internal-hero__inner scale-reveal">
+          <span className="section-subtitle">Uncompromising Trust</span>
+          <h1 className="internal-hero__title">Quality Assurance</h1>
+          <p>Defining excellence through rigorous testing, continuous monitoring, and absolute compliance with global hosiery standards.</p>
+        </div>
+      </section>
 
-            <div className="page-container" style={{ marginTop: '50px', marginBottom: '80px' }}>
-                <section className="quality-intro" style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 60px' }}>
-                    <div style={{ display: 'inline-block', padding: '10px 20px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid var(--accent)', borderRadius: '30px', marginBottom: '30px' }}>
-                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--accent)' }}>Achieving 1.5 AQL Standard</span>
-                    </div>
-                    <h2 style={{ fontSize: '32px', color: 'var(--text)', marginBottom: '20px' }}>Excellence in Every Stitch</h2>
-                    <p style={{ fontSize: '18px', color: 'var(--muted)', lineHeight: '1.8' }}>
-                        Our Quality Standards are incredibly high. We conduct rigorous internal quality assurance at every stage of production. From initial raw material sourcing to the final packaged product, our dedicated QC team ensures that every stage meets the exact specification to deliver premium quality garments.
-                    </p>
-                </section>
-
-                <section className="quality-grid">
-                    <div className="grid grid--three">
-                        {qualityPoints.map((point, index) => (
-                            <div key={index} className="pro-card pro-card--compact" style={{ padding: '30px', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}>
-                                <div style={{ fontSize: '40px', marginBottom: '20px', display: 'inline-block', padding: '15px', background: 'var(--accent)', borderRadius: '50%', color: 'white' }}>
-                                    {point.icon}
-                                </div>
-                                <h3 style={{ fontSize: '20px', marginBottom: '15px', color: 'var(--text)' }}>{point.title}</h3>
-                                <p style={{ color: 'var(--muted)', fontSize: '15px', lineHeight: '1.6' }}>{point.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <style>{`
-                .quality-grid .pro-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                }
-                [data-theme='dark'] .quality-grid .pro-card:hover {
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                }
-            `}</style>
-                </section>
+        <div className="page-container" style={{ marginBottom: '80px' }}>
+          <section className="quality-intro reveal-on-scroll" style={{ textAlign: 'center', maxWidth: '900px', margin: '0 auto 50px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(15, 46, 90, 0.05)', borderRadius: '50px', color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '25px' }}>
+              <CheckCircle2 size={18} color="var(--secondary)" />
+              Achieving 1.5 AQL Global Standard
             </div>
-        </main>
+            <h2 style={{ fontSize: '2.8rem', marginBottom: '20px' }}>Excellence in Every Stitch</h2>
+            <p className="intro-text" style={{ fontSize: '1.2rem', color: 'var(--muted)', lineHeight: '1.8' }}>
+              Our Quality Standards are set beyond industry benchmarks. We conduct rigorous internal quality assurance at every stage—from initial raw material sourcing to the final packaged product—ensuring zero-defect delivery.
+            </p>
+          </section>
+
+          <section className="quality-grid">
+            <div className="grid grid--three" style={{ gap: '30px' }}>
+              {qualityPoints.map((point, index) => (
+                <div key={index} className="pro-card reveal-on-scroll" style={{ animationDelay: `${index * 0.15}s`, padding: '40px' }}>
+                  <div className="cap-icon" style={{ marginBottom: '30px', background: `${point.color}10` }}>
+                    <span style={{ color: point.color }}>{point.icon}</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '15px' }}>{point.title}</h3>
+                  <p className="cap-desc" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{point.desc}</p>
+                </div>
+              ))}
+              
+              {/* Specialized trust card */}
+              <div className="pro-card reveal-on-scroll" style={{ gridColumn: 'span 1', background: 'var(--primary)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '40px', animationDelay: '0.9s' }}>
+                 <h2 style={{ color: 'white', fontSize: '1.8rem', marginBottom: '15px' }}>Global Certifications</h2>
+                 <p style={{ opacity: '0.8', marginBottom: '25px' }}>Our facilities are audited for social, environmental, and technical compliance by leading global agencies.</p>
+                 <button className="pro-button" style={{ background: 'white', color: 'var(--primary)', border: 'none', width: 'fit-content' }}>View Compliance Docs</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     );
 }

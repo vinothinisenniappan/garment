@@ -21,6 +21,8 @@ export default function Footer() {
               <li><Link to="/products">Products</Link></li>
               <li><Link to="/partnership">Partnership</Link></li>
               <li><Link to="/buyer-inquiry">Buyer Inquiry</Link></li>
+              <li><Link to="/sample-inquiry">Sample Inquiry</Link></li>
+              <li><Link to="/track-sample">Track Sample</Link></li>
               <li><Link to="/contact">Contact Us</Link></li>
             </ul>
           </nav>

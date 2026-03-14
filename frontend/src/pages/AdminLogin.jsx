@@ -32,31 +32,31 @@ export default function AdminLogin() {
   }
 
   return (
-    <main className="admin-login-page">
-      <div className="admin-login-overlay"></div>
-      <div className="admin-login-container">
-        <div className="admin-login-box glassmorphic">
-          <header className="admin-login-header">
-            <div className="admin-login-logo">◎</div>
-            <h1>Admin Portal</h1>
-            <p>Authorized access only</p>
+    <main className="admin-login-page app--internal" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0F172A' }}>
+      <div className="admin-login-container" style={{ width: '100%', maxWidth: '400px', padding: '20px', position: 'relative', zIndex: 1 }}>
+        <div className="pro-card" style={{ padding: '40px', background: '#1E293B', border: '1px solid #334155', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+          <header className="admin-login-header center" style={{ marginBottom: '35px' }}>
+            <div className="admin-login-logo" style={{ fontSize: '3rem', color: '#38BDF8', marginBottom: '15px' }}>◎</div>
+            <h1 style={{ color: 'white', fontSize: '1.8rem', marginBottom: '8px', letterSpacing: '1px' }}>Control Center</h1>
+            <p className="cap-desc" style={{ color: '#94A3B8' }}>Authorized Personnel Only</p>
           </header>
 
           <form className="pro-form" onSubmit={handleSubmit}>
-            <div className="pro-field">
-              <label htmlFor="adminId">Administrator ID</label>
+            <div className="pro-field" style={{ marginBottom: '20px' }}>
+              <label htmlFor="adminId" style={{ color: '#E2E8F0' }}>Administrator ID</label>
               <input
                 id="adminId"
                 type="text"
                 className="pro-input"
-                placeholder="Enter email address"
+                placeholder="system_admin"
                 value={adminId}
                 onChange={(e) => setAdminId(e.target.value)}
+                style={{ background: '#0F172A', border: '1px solid #334155', color: 'white' }}
                 autoFocus
               />
             </div>
-            <div className="pro-field">
-              <label htmlFor="passphrase">Passphrase</label>
+            <div className="pro-field" style={{ marginBottom: '30px' }}>
+              <label htmlFor="passphrase" style={{ color: '#E2E8F0' }}>Secure Passphrase</label>
               <input
                 id="passphrase"
                 type="password"
@@ -64,43 +64,32 @@ export default function AdminLogin() {
                 placeholder="••••••••"
                 value={pass}
                 onChange={(e) => setPass(e.target.value)}
+                style={{ background: '#0F172A', border: '1px solid #334155', color: 'white' }}
               />
             </div>
 
             {error && (
-              <div className="admin-login-error-msg">
-                <span>⚠</span> {error}
+              <div className="admin-login-error-msg" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#F87171', padding: '12px', borderRadius: '8px', marginBottom: '25px', fontSize: '13px', textAlign: 'center' }}>
+                {error}
               </div>
             )}
 
-            <button type="submit" className="pro-button primary-btn">
-              <span>Secure Sign In</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+            <button type="submit" className="pro-button" style={{ width: '100%', height: '52px', background: 'var(--primary)', color: 'white', fontWeight: 'bold' }}>
+              Validate & Access
             </button>
           </form>
 
-          <footer className="admin-login-footer">
+          <footer className="admin-login-footer center" style={{ marginTop: '35px', paddingTop: '25px', borderTop: '1px solid #334155' }}>
             <button
-              className="admin-login-back-btn"
+              className="filter-btn"
               onClick={() => navigate('/')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                marginBottom: '10px',
-                display: 'block',
-                width: '100%',
-                textAlign: 'center'
-              }}
+              style={{ width: '100%', height: '44px', color: '#94A3B8' }}
             >
-              ← Back to Home Page
+              ← System Exit
             </button>
-            <p>© 2026 Admin Control System</p>
-            <span>Protected by enterprise-level encryption</span>
+            <div style={{ marginTop: '20px', fontSize: '11px', color: '#64748B', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Protected by Quantum Encryption Layer
+            </div>
           </footer>
         </div>
       </div>

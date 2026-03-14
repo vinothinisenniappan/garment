@@ -14,14 +14,18 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Infrastructure from './pages/Infrastructure'
 import History from './pages/History'
 import Products from './pages/Products'
+import ProductDetail from './pages/ProductDetail'
 
 import UserLogin from './pages/UserLogin'
 import UserRegister from './pages/UserRegister'
-import LiveCapacity from './pages/LiveCapacity'
+
 import Traceability from './pages/Traceability'
 import TechPackBuilder from './pages/TechPackBuilder'
 import Partnership from './pages/Partnership'
 import QualityPolicy from './pages/QualityPolicy'
+import Inventory from './pages/Inventory'
+import SampleInquiry from './pages/SampleInquiry'
+import TrackSample from './pages/TrackSample'
 
 export default function App() {
   const location = useLocation();
@@ -56,13 +60,17 @@ export default function App() {
         <Route path="/infrastructure" element={<Infrastructure />} />
         <Route path="/history" element={<History />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/register" element={<UserRegister />} />
-        <Route path="/live-capacity" element={<LiveCapacity />} />
+
         <Route path="/traceability" element={<Traceability />} />
         <Route path="/tech-pack-builder" element={<TechPackBuilder />} />
         <Route path="/partnership" element={<Partnership />} />
         <Route path="/quality-policy" element={<QualityPolicy />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/sample-inquiry" element={<SampleInquiry />} />
+        <Route path="/track-sample" element={<TrackSample />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
       </Routes>

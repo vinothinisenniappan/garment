@@ -40,6 +40,30 @@ const productSchema = new mongoose.Schema({
     type: String, // URLs to image files
     trim: true
   }],
+  price: {
+    type: Number,
+    required: [true, 'Price is required'],
+    default: 0
+  },
+  stockQuantity: {
+    type: Number,
+    required: [true, 'Stock quantity is required'],
+    default: 0
+  },
+  inventory: {
+    S: { type: Number, default: 0 },
+    M: { type: Number, default: 0 },
+    L: { type: Number, default: 0 },
+    XL: { type: Number, default: 0 }
+  },
+  colors: [{
+    type: String,
+    trim: true
+  }],
+  isFeatured: {
+    type: Boolean,
+    default: false
+  },
   isActive: {
     type: Boolean,
     default: true
@@ -54,8 +78,11 @@ const productSchema = new mongoose.Schema({
   }
 });
 
-// Update the updatedAt field before saving
+// Middleware to calculate total stock quantity from inventory map
 productSchema.pre('save', function (next) {
+  if (this.isModified('inventory')) {
+    this.stockQuantity = (this.inventory.S || 0) + (this.inventory.M || 0) + (this.inventory.L || 0) + (this.inventory.XL || 0);
+  }
   this.updatedAt = Date.now();
   next();
 });

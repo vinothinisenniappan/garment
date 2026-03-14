@@ -7,6 +7,11 @@ const Admin = require('../../models/Admin');
 const Product = require('../../models/Product');
 const Buyer = require('../../models/Buyer');
 const SampleRequest = require('../../models/SampleRequest');
+const Order = require('../../models/Order');
+const Inquiry = require('../../models/Inquiry');
+const Category = require('../../models/Category');
+const Coupon = require('../../models/Coupon');
+const Review = require('../../models/Review');
 const { validationResult } = require('express-validator');
 
 // Handle admin login
@@ -105,12 +110,29 @@ exports.checkAuth = (req, res) => {
 exports.getDashboard = async (req, res) => {
   try {
     const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
     const last7Days = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
     const prev7Days = new Date(last7Days.getTime() - (7 * 24 * 60 * 60 * 1000));
 
     // Basic Counts
-    const totalProducts = await Product.countDocuments({ isActive: true });
+    const totalProducts = await Product.countDocuments();
+    const activeProducts = await Product.countDocuments({ isActive: true });
     const totalBuyers = await Buyer.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const ordersToday = await Order.countDocuments({ createdAt: { $gte: startOfToday } });
+    
+    // Revenue Calculation
+    const revenueData = await Order.aggregate([
+      { $match: { paymentStatus: 'Completed' } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
+
+    // Small Stock Alert (items with stock < 10)
+    const lowStockAlerts = await Product.countDocuments({ stockQuantity: { $lt: 20 } });
+
     const totalSamples = await SampleRequest.countDocuments();
     const pendingSamples = await SampleRequest.countDocuments({ status: 'Requested' });
     const newInquiries = await Buyer.countDocuments({ status: 'New' });
@@ -120,15 +142,11 @@ exports.getDashboard = async (req, res) => {
     const prev7DaysInquiries = await Buyer.countDocuments({ submittedAt: { $gte: prev7Days, $lt: last7Days } });
     const inquiryTrend = prev7DaysInquiries === 0 ? (current7DaysInquiries > 0 ? '+100%' : '0%') : `${Math.round(((current7DaysInquiries - prev7DaysInquiries) / prev7DaysInquiries) * 100)}%`;
 
-    // Engagement Rate (Non-New Buyers / Total Buyers)
+    // Engagement Rate
     const engagedBuyers = await Buyer.countDocuments({ status: { $ne: 'New' } });
     const engagementRate = totalBuyers === 0 ? 0 : Math.round((engagedBuyers / totalBuyers) * 100);
 
     // 7-Day Trend for Chart
-    // Normalize now to the end of today and last7Days to start of 7 days ago
-    const startOfToday = new Date(now);
-    startOfToday.setHours(23, 59, 59, 999);
-
     const sevenDaysAgo = new Date(now);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     sevenDaysAgo.setHours(0, 0, 0, 0);
@@ -144,7 +162,6 @@ exports.getDashboard = async (req, res) => {
       { $sort: { "_id": 1 } }
     ]);
 
-    // Map to last 7 days array to ensure all days are represented
     const trendData = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
@@ -155,13 +172,21 @@ exports.getDashboard = async (req, res) => {
     }
 
     const recentBuyers = await Buyer.find().sort({ submittedAt: -1 }).limit(10);
-    const products = await Product.find().sort({ createdAt: -1 }).limit(10);
+    const recentOrders = await Order.find()
+      .populate('buyerId', 'companyName')
+      .sort({ createdAt: -1 })
+      .limit(5);
 
     res.json({
       success: true,
       stats: {
         totalProducts,
+        activeProducts,
         totalBuyers,
+        totalOrders,
+        ordersToday,
+        totalRevenue,
+        lowStockAlerts,
         totalSamples,
         pendingSamples,
         newInquiries,
@@ -170,7 +195,7 @@ exports.getDashboard = async (req, res) => {
         trendData
       },
       recentBuyers,
-      products
+      recentOrders
     });
   } catch (error) {
     console.error('Error loading dashboard:', error);
@@ -284,7 +309,11 @@ exports.addProduct = async (req, res) => {
       fabricType: req.body.fabricType,
       gsm: req.body.gsm,
       sizeRange: req.body.sizeRange,
-      images: images
+      price: req.body.price,
+      inventory: req.body.inventory || { S: 0, M: 0, L: 0, XL: 0 },
+      colors: req.body.colors || [],
+      images: images,
+      isFeatured: req.body.isFeatured || false
     };
 
     const product = new Product(productData);
@@ -333,7 +362,11 @@ exports.updateProduct = async (req, res) => {
       fabricType: req.body.fabricType,
       gsm: req.body.gsm,
       sizeRange: req.body.sizeRange,
+      price: req.body.price,
+      inventory: req.body.inventory,
+      colors: req.body.colors,
       images: images,
+      isFeatured: req.body.isFeatured,
       isActive: req.body.isActive !== undefined ? req.body.isActive : true
     };
 
@@ -521,5 +554,102 @@ exports.updateSampleStatus = async (req, res) => {
       message: 'Error updating sample status',
       error: error.message
     });
+  }
+};
+
+// Category Management
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ name: 1 });
+    res.json({ success: true, categories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error loading categories' });
+  }
+};
+
+exports.addCategory = async (req, res) => {
+  try {
+    const category = new Category(req.body);
+    await category.save();
+    res.json({ success: true, message: 'Category added', category });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error adding category' });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Category deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting category' });
+  }
+};
+
+// Coupon Management
+exports.getCoupons = async (req, res) => {
+  try {
+    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    res.json({ success: true, coupons });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error loading coupons' });
+  }
+};
+
+exports.addCoupon = async (req, res) => {
+  try {
+    const coupon = new Coupon(req.body);
+    await coupon.save();
+    res.json({ success: true, message: 'Coupon created', coupon });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error creating coupon' });
+  }
+};
+
+// Review Management
+exports.getReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find()
+      .populate('productId', 'name')
+      .populate('buyerId', 'contactPerson')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, reviews });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error loading reviews' });
+  }
+};
+
+exports.updateReviewStatus = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndUpdate(req.params.id, { isApproved: req.body.isApproved }, { new: true });
+    res.json({ success: true, message: 'Review status updated', review });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating review' });
+  }
+};
+
+// Order Management (Full)
+exports.getOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate('buyerId', 'companyName contactPerson email')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error loading orders' });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status, paymentStatus, currentMilestone } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id, 
+      { status, paymentStatus, currentMilestone }, 
+      { new: true }
+    );
+    res.json({ success: true, message: 'Order updated', order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating order' });
   }
 };

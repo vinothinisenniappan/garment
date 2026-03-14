@@ -16,10 +16,29 @@ const orderSchema = new mongoose.Schema({
         ref: 'Buyer',
         required: true
     },
+    items: [{
+        productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        },
+        name: String,
+        size: String,
+        quantity: Number,
+        priceAtPurchase: Number
+    }],
+    totalAmount: {
+        type: Number,
+        default: 0
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
+        default: 'Pending'
+    },
     status: {
         type: String,
-        enum: ['Active', 'Completed', 'Cancelled'],
-        default: 'Active'
+        enum: ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled'],
+        default: 'Pending'
     },
     currentMilestone: {
         type: String,
@@ -46,8 +65,13 @@ const orderSchema = new mongoose.Schema({
             trim: true
         }
     }],
-    expectedDeliveryDate: {
-        type: Date
+    shippingAddress: {
+        name: String,
+        street: String,
+        city: String,
+        state: String,
+        zip: String,
+        country: String
     },
     createdAt: {
         type: Date,

@@ -76,35 +76,38 @@ export default function BuyerInquiry() {
   }
 
   return (
-    <main className="inquiry-page">
-      <section className="history-hero" style={{ '--hero-bg': "url('/assets/infrastructure/an.webp')" }}>
-        <div className="history-hero__inner">
-          <div className="history-hero__text-group">
-            <div className="history-hero__tagline">Tailored Solutions for Your Brand</div>
-            <h1 className="history-hero__title">Business Inquiries</h1>
-          </div>
+    <main className="inquiry-page app--internal">
+      <section className="internal-hero">
+        <div className="internal-hero__inner">
+          <span className="section-subtitle">Tailored Solutions for Your Brand</span>
+          <h1 className="internal-hero__title">Business Inquiries</h1>
+          <p>Partner with us to experience excellence in sustainable garment production. Fill out the form below to start our collaboration.</p>
         </div>
       </section>
 
-      <div className="page-container" style={{ marginBottom: '80px' }}>
+      <div className="page-container" style={{ marginBottom: '40px' }}>
         {submitted ? (
-          <div className="pro-card" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ marginBottom: '10px' }}>Thank you for your inquiry</h2>
-            <p style={{ color: 'var(--muted)' }}>Our team will review your details and contact you shortly.</p>
+          <div className="pro-card center" style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <h2>Thank you for your inquiry</h2>
+            <p className="cap-desc">Our team will review your details and contact you shortly.</p>
+            <button className="pro-button" onClick={() => setSubmitted(false)} style={{ marginTop: '20px' }}>Send Another Inquiry</button>
           </div>
         ) : (
           <form className="pro-form" onSubmit={handleSubmit} style={{ maxWidth: '900px', margin: '0 auto' }}>
             {/* Section 1: Company Details */}
             <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Company Details</h2>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="section-header">
+                <span className="section-subtitle">Profile</span>
+                <h2>Company Details</h2>
+              </div>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Company / Firm Name</label>
-                  <input type="text" className="pro-input" placeholder="Your company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+                  <input type="text" className="pro-input" placeholder="Your company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
                 </div>
                 <div className="pro-field">
                   <label>Business Type</label>
-                  <select className="pro-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)}>
+                  <select className="pro-input" value={businessType} onChange={(e) => setBusinessType(e.target.value)} required>
                     <option value="">Select</option>
                     <option>Wholesaler</option>
                     <option>Distributor</option>
@@ -113,43 +116,45 @@ export default function BuyerInquiry() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>State & City</label>
-                  <input type="text" className="pro-input" placeholder="e.g. Tamilnadu, Tirupur" value={stateCity} onChange={(e) => setStateCity(e.target.value)} />
+                  <input type="text" className="pro-input" placeholder="e.g. Tamilnadu, Tirupur" value={stateCity} onChange={(e) => setStateCity(e.target.value)} required />
                 </div>
                 <div className="pro-field">
                   <label>Country</label>
-                  <input type="text" className="pro-input" placeholder="e.g. India" value={country} onChange={(e) => setCountry(e.target.value)} />
+                  <input type="text" className="pro-input" placeholder="e.g. India" value={country} onChange={(e) => setCountry(e.target.value)} required />
                 </div>
               </div>
               <div className="pro-field">
                 <label>Years in Business</label>
                 <input type="number" className="pro-input" placeholder="e.g. 5" value={years} onChange={(e) => setYears(e.target.value)} />
               </div>
-              <p style={{ color: 'var(--muted)', marginTop: '10px' }}>This information helps us understand your business profile and order capacity.</p>
             </section>
 
             {/* Section 2: Contact Details */}
             <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Contact Details</h2>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="section-header">
+                <span className="section-subtitle">Communication</span>
+                <h2>Contact Details</h2>
+              </div>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Contact Person Name</label>
-                  <input type="text" className="pro-input" placeholder="Full name" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} />
+                  <input type="text" className="pro-input" placeholder="Full name" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} required />
                 </div>
                 <div className="pro-field">
                   <label>Mobile Number</label>
-                  <input type="tel" className="pro-input" placeholder="e.g. +91 98437 34959" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <input type="tel" className="pro-input" placeholder="e.g. +91 98437 34959" value={phone} onChange={(e) => setPhone(e.target.value)} required />
                 </div>
               </div>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Email Address</label>
-                  <input type="email" className="pro-input" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <input type="email" className="pro-input" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 </div>
                 <div className="pro-field">
-                  <label>Preferred Mode of Communication</label>
+                  <label>Preferred Mode</label>
                   <select className="pro-input" value={communication} onChange={(e) => setCommunication(e.target.value)}>
                     <option>Call</option>
                     <option>Email</option>
@@ -161,8 +166,11 @@ export default function BuyerInquiry() {
 
             {/* Section 3: Product Details */}
             <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Product Details</h2>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="section-header">
+                <span className="section-subtitle">Sourcing</span>
+                <h2>Product Details</h2>
+              </div>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Product Category</label>
                   <select className="pro-input" value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -183,17 +191,17 @@ export default function BuyerInquiry() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>GSM Requirement</label>
                   <input type="text" className="pro-input" placeholder="e.g. 180 GSM" value={gsm} onChange={(e) => setGsm(e.target.value)} />
                 </div>
                 <div className="pro-field">
-                  <label>Size Range Required</label>
+                  <label>Size Range</label>
                   <input type="text" className="pro-input" placeholder="e.g. XS-XXL" value={sizeRange} onChange={(e) => setSizeRange(e.target.value)} />
                 </div>
               </div>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Color Preference</label>
                   <input type="text" className="pro-input" placeholder="e.g. Navy, White" value={colorPref} onChange={(e) => setColorPref(e.target.value)} />
@@ -207,16 +215,18 @@ export default function BuyerInquiry() {
                   </select>
                 </div>
               </div>
-              <p style={{ color: 'var(--muted)', marginTop: '10px' }}>Please mention clear product specifications to receive accurate quotations.</p>
             </section>
 
             {/* Section 4: Order Details */}
             <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Order Details</h2>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="section-header">
+                <span className="section-subtitle">Logistics</span>
+                <h2>Order & Delivery</h2>
+              </div>
+              <div className="grid grid--two">
                 <div className="pro-field">
-                  <label>Estimated Order Quantity</label>
-                  <input type="text" className="pro-input" placeholder="e.g. 5,000 units" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                  <label>Estimated Quantity</label>
+                  <input type="text" className="pro-input" placeholder="e.g. 5,000 units" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
                 </div>
                 <div className="pro-field">
                   <label>Order Type</label>
@@ -226,56 +236,30 @@ export default function BuyerInquiry() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
-                <div className="pro-field">
-                  <label>Target Price Range (Optional)</label>
-                  <input type="text" className="pro-input" placeholder="e.g. $7 - $10 / piece" value={targetPrice} onChange={(e) => setTargetPrice(e.target.value)} />
-                </div>
-                <div className="pro-field">
-                  <label>Packaging Requirement</label>
-                  <select className="pro-input" value={packaging} onChange={(e) => setPackaging(e.target.value)}>
-                    <option>Normal</option>
-                    <option>Custom Branded</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 5: Delivery Details */}
-            <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Delivery Details</h2>
-              <div className="grid grid--two" style={{ gap: '20px' }}>
+              <div className="grid grid--two">
                 <div className="pro-field">
                   <label>Delivery Location</label>
                   <input type="text" className="pro-input" placeholder="City / Port / Address" value={deliveryLocation} onChange={(e) => setDeliveryLocation(e.target.value)} />
                 </div>
                 <div className="pro-field">
-                  <label>Expected Delivery Date</label>
+                  <label>Expected Date</label>
                   <input type="date" className="pro-input" value={expectedDate} onChange={(e) => setExpectedDate(e.target.value)} />
                 </div>
               </div>
-              <div className="pro-field">
-                <label>Transportation Preference</label>
-                <select className="pro-input" value={transport} onChange={(e) => setTransport(e.target.value)}>
-                  <option>Self Pickup</option>
-                  <option>Transport Service</option>
-                </select>
-              </div>
             </section>
 
-            {/* Section 6: Additional Notes */}
-            <section className="pro-card" style={{ marginBottom: '20px' }}>
-              <h2 style={{ color: 'var(--nav-bg)', marginBottom: '10px' }}>Additional Notes</h2>
+            {/* Section 5: Additional Notes */}
+            <section className="pro-card" style={{ marginBottom: '30px' }}>
+              <div className="section-header">
+                <span className="section-subtitle">Customization</span>
+                <h2>Additional Notes</h2>
+              </div>
               <div className="pro-field">
                 <label>Special Instructions</label>
-                <textarea className="pro-input" rows="4" placeholder="Any specific instructions for production, packing, or labeling" value={specialInstructions} onChange={(e) => setSpecialInstructions(e.target.value)}></textarea>
+                <textarea className="pro-input" rows="4" placeholder="Specific instructions for production, packing, or labeling" value={specialInstructions} onChange={(e) => setSpecialInstructions(e.target.value)}></textarea>
               </div>
               <div className="pro-field">
-                <label>Custom Design Requests</label>
-                <textarea className="pro-input" rows="4" placeholder="Upload or describe your design requirements" value={customDesign} onChange={(e) => setCustomDesign(e.target.value)}></textarea>
-              </div>
-              <div className="pro-field">
-                <label>Long-Term Partnership Interest</label>
+                <label>Long-Term Partnership Interest?</label>
                 <select className="pro-input" value={longTerm} onChange={(e) => setLongTerm(e.target.value)}>
                   <option>Yes</option>
                   <option>No</option>
@@ -283,9 +267,8 @@ export default function BuyerInquiry() {
               </div>
             </section>
 
-            {/* Submit */}
-            {error && (<div style={{ color: 'crimson', fontWeight: 600, fontSize: '13px', marginBottom: '10px' }}>{error}</div>)}
-            <button type="submit" className="pro-button" style={{ width: '100%' }}>Submit Business Inquiry</button>
+            {error && (<div className="error-message" style={{ color: 'var(--accent)', fontWeight: 600, marginBottom: '20px', textAlign: 'center' }}>{error}</div>)}
+            <button type="submit" className="pro-button" style={{ width: '100%', height: '56px', fontSize: '18px' }}>Submit Business Inquiry</button>
           </form>
         )}
       </div>

@@ -1,44 +1,116 @@
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
+import { 
+  LayoutDashboard, 
+  ShoppingBag, 
+  ShoppingCart, 
+  Users, 
+  Boxes, 
+  Tags, 
+  Ticket, 
+  Star, 
+  BarChart3, 
+  Image as ImageIcon, 
+  Settings, 
+  FileText, 
+  LogOut,
+  Bell,
+  Search,
+  RefreshCcw,
+  Zap
+} from 'lucide-react'
 import { apiBaseUrl, apiFetch } from '../lib/api'
-import ProductionMilestoneTracker from '../components/ProductionMilestoneTracker'
+
+// Import Modular Sections
+import DashboardHome from '../components/admin/DashboardHome'
+import ProductManager from '../components/admin/ProductManager'
+import OrderManager from '../components/admin/OrderManager'
+import CustomerList from '../components/admin/CustomerList'
+import InventoryMatrix from '../components/admin/InventoryMatrix'
+import CategoryManager from '../components/admin/CategoryManager'
+import CouponManager from '../components/admin/CouponManager'
+import ReviewModerator from '../components/admin/ReviewModerator'
+import SalesAnalytics from '../components/admin/SalesAnalytics'
+import ReportDownloader from '../components/admin/ReportDownloader'
+import ProductForm from '../components/admin/ProductForm'
 
 export default function AdminDashboard() {
+  const [activeSection, setActiveSection] = useState('Dashboard')
   const [stats, setStats] = useState({
-    newInquiries: 0,
-    pendingSamples: 0,
     totalProducts: 0,
+    activeProducts: 0,
+    totalBuyers: 0,
+    totalOrders: 0,
+    ordersToday: 0,
+    totalRevenue: 0,
+    lowStockAlerts: 0,
+    newInquiries: 0,
     engagementRate: 0,
     inquiryTrend: '0%',
     trendData: [0, 0, 0, 0, 0, 0, 0]
   })
-  const [recentBuyers, setRecentBuyers] = useState([])
-  const [products, setProducts] = useState([])
-  const [activeSection, setActiveSection] = useState('Dashboard')
+  
+  const [data, setData] = useState({
+    products: [],
+    orders: [],
+    buyers: [],
+    categories: [],
+    coupons: [],
+    reviews: [],
+    recentOrders: []
+  })
+
   const [liveNotification, setLiveNotification] = useState('')
   const [lastUpdated, setLastUpdated] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showProductForm, setShowProductForm] = useState(false)
+  const [currentProduct, setCurrentProduct] = useState(null)
 
-  const fetchDashboard = async () => {
+  const sidebarItems = [
+    { name: 'Dashboard', icon: LayoutDashboard },
+    { name: 'Products', icon: ShoppingBag },
+    { name: 'Orders', icon: ShoppingCart },
+    { name: 'Customers', icon: Users },
+    { name: 'Inventory', icon: Boxes },
+    { name: 'Categories', icon: Tags },
+    { name: 'Coupons', icon: Ticket },
+    { name: 'Reviews', icon: Star },
+    { name: 'Analytics', icon: BarChart3 },
+    { name: 'Reports', icon: FileText },
+    { name: 'Settings', icon: Settings }
+  ]
+
+  const fetchAllData = async () => {
     try {
       setLoading(true)
-      setError('')
-
-      const data = await apiFetch('/api/admin/dashboard')
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to load dashboard')
+      const res = await apiFetch('/api/admin/dashboard')
+      if (res.success) {
+        setStats(res.stats)
+        setData(prev => ({ ...prev, recentOrders: res.recentOrders }))
       }
-      setStats({
-        newInquiries: data.stats?.newInquiries || 0,
-        pendingSamples: data.stats?.pendingSamples || 0,
-        totalProducts: data.stats?.totalProducts || 0,
-        engagementRate: data.stats?.engagementRate || 0,
-        inquiryTrend: data.stats?.inquiryTrend || '0%',
-        trendData: data.stats?.trendData || [0, 0, 0, 0, 0, 0, 0]
+
+      // Fetch specific module data based on active section or all at once?
+      // For a "Pro" feel, we'll fetch what's needed
+      const [pRes, oRes, bRes, cRes, cpRes, rRes] = await Promise.all([
+        apiFetch('/api/admin/products'),
+        apiFetch('/api/admin/orders'),
+        apiFetch('/api/admin/buyers'),
+        apiFetch('/api/admin/categories'),
+        apiFetch('/api/admin/coupons').catch(() => ({ coupons: [] })),
+        apiFetch('/api/admin/reviews').catch(() => ({ reviews: [] }))
+      ])
+
+      setData({
+        products: pRes.products || [],
+        orders: oRes.orders || [],
+        buyers: bRes.buyers || [],
+        categories: cRes.categories || [],
+        coupons: cpRes.coupons || [],
+        reviews: rRes.reviews || [],
+        recentOrders: res.recentOrders || []
       })
-      setRecentBuyers(Array.isArray(data.recentBuyers) ? data.recentBuyers : [])
-      setProducts(Array.isArray(data.products) ? data.products : [])
+
       setLastUpdated(new Date())
     } catch (e) {
       setError(e.message)
@@ -47,397 +119,219 @@ export default function AdminDashboard() {
     }
   }
 
-  useEffect(() => {
-    fetchDashboard()
-
-    // Connect to Socket.io for real-time updates
-    const socketUrl = apiBaseUrl || window.location.origin
-    const socket = io(socketUrl, { withCredentials: true })
-
-    socket.on('new-inquiry', (data) => {
-      console.log('Real-time update received:', data)
-      setLiveNotification(data?.message || `You got a order message from the buyer(${data?.buyerName || 'Unknown Buyer'}).`)
-      fetchDashboard()
-    })
-
-    const id = setInterval(fetchDashboard, 60000) // refresh every 1m
-    const clearNotificationId = setInterval(() => {
-      setLiveNotification('')
-    }, 20000)
-
-    return () => {
-      clearInterval(id)
-      clearInterval(clearNotificationId)
-      socket.disconnect()
+  const handleSaveProduct = async (formData) => {
+    try {
+      const method = formData._id ? 'PUT' : 'POST'
+      const url = formData._id ? `/api/admin/products/${formData._id}` : '/api/admin/products'
+      const res = await apiFetch(url, {
+        method,
+        body: JSON.stringify(formData)
+      })
+      if (res.success) {
+        setShowProductForm(false)
+        fetchAllData()
+      }
+    } catch (e) {
+      alert(`Error saving product: ${e.message}`)
     }
-  }, [])
-
-  const sidebarItems = ['Dashboard', 'Recent Inquiries', 'Product Catalog', 'Active Orders', 'Generated Tech-Packs', 'Settings']
-
-  const formatShortTime = (date) => {
-    if (!date) return 'just now'
-    const diffMs = Date.now() - date.getTime()
-    const minutes = Math.floor(diffMs / 60000)
-    if (minutes <= 1) return 'just now'
-    if (minutes < 60) return `${minutes} minutes ago`
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours} hours ago`
-    return `${Math.floor(hours / 24)} days ago`
   }
 
-  const statCardsData = [
-    { label: 'New Inquiries', value: String(stats.newInquiries), trend: stats.inquiryTrend, color: 'var(--accent)' },
-    { label: 'Pending Samples', value: String(stats.pendingSamples), trend: '+0%', color: '#f59e0b' },
-    { label: 'Total Products', value: String(stats.totalProducts), trend: '+0%', color: '#10b981' }
-  ]
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        const res = await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+        if (res.success) fetchAllData()
+      } catch (e) {
+        alert(e.message)
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchAllData()
+    const socket = io(apiBaseUrl || window.location.origin, { withCredentials: true })
+    socket.on('new-inquiry', (msg) => {
+      setLiveNotification(msg?.message || 'New inquiry received!')
+      fetchAllData()
+    })
+    return () => socket.disconnect()
+  }, [])
 
   const renderContent = () => {
-    if (activeSection === 'Recent Inquiries') {
-      return (
-        <article className="admin-analytics-card" style={{ marginTop: '20px' }}>
-          <h3>Inquiry Database</h3>
-          <div className="admin-table-wrap" style={{ overflowX: 'auto', marginTop: '15px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  <th style={{ padding: '12px' }}>Buyer / Person</th>
-                  <th style={{ padding: '12px' }}>Email</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                  <th style={{ padding: '12px' }}>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentBuyers.map(buyer => (
-                  <tr key={buyer._id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px' }}>
-                      <div style={{ fontWeight: 600 }}>{buyer.companyName}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{buyer.contactPerson}</div>
-                    </td>
-                    <td style={{ padding: '12px' }}>{buyer.email}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span style={{
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '11px',
-                        textTransform: 'uppercase',
-                        background: buyer.status === 'New' ? 'rgba(3,70,148,0.1)' : 'rgba(16,185,129,0.1)',
-                        color: buyer.status === 'New' ? 'var(--accent)' : '#10b981'
-                      }}>
-                        {buyer.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px' }}>{new Date(buyer.submittedAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      )
-    }
-
-    if (activeSection === 'Product Catalog') {
-      return (
-        <article className="admin-analytics-card" style={{ marginTop: '20px' }}>
-          <h3>Product Catalog</h3>
-          <div className="admin-table-wrap" style={{ overflowX: 'auto', marginTop: '15px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  <th style={{ padding: '12px' }}>Product</th>
-                  <th style={{ padding: '12px' }}>Category</th>
-                  <th style={{ padding: '12px' }}>Fabric</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map(prod => (
-                  <tr key={prod._id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px' }}>
-                      <div style={{ fontWeight: 600 }}>{prod.name}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{prod.sizeRange}</div>
-                    </td>
-                    <td style={{ padding: '12px' }}>{prod.category}</td>
-                    <td style={{ padding: '12px' }}>{prod.fabricType}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span style={{ color: prod.isActive ? '#10b981' : '#ef4444' }}>
-                        {prod.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-      )
-    }
-
-    if (activeSection === 'Active Orders') {
-      return (
-        <article className="admin-analytics-card" style={{ marginTop: '20px' }}>
-          <h3>Active Orders Tracking</h3>
-          <div style={{ marginTop: '30px', marginBottom: '30px' }}>
-            <div style={{ marginBottom: '30px', padding: '20px', border: '1px solid var(--border)', borderRadius: '12px', background: '#f8fafc' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--nav-bg)' }}>Order #ORD-2026-892</div>
-                  <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>Buyer: Global Retail Co. • Items: 5,000 T-Shirts • Est. Delivery: Oct 15</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', marginRight: '8px', color: 'var(--muted)' }}>Update Stage:</label>
-                  <select className="pro-input" style={{ padding: '6px 12px', width: 'auto', background: 'white' }} defaultValue="Stitching">
-                    <option>Sourcing</option>
-                    <option>Cutting</option>
-                    <option value="Stitching">Stitching</option>
-                    <option>QC</option>
-                    <option>Shipping</option>
-                  </select>
-                </div>
-              </div>
-              <ProductionMilestoneTracker currentStage="Stitching" />
-            </div>
-
-            <div style={{ padding: '20px', border: '1px solid var(--border)', borderRadius: '12px', background: '#f8fafc' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--nav-bg)' }}>Order #ORD-2026-904</div>
-                  <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>Buyer: Fashion Brand X • Items: 2,500 Shirts • Est. Delivery: Nov 02</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', marginRight: '8px', color: 'var(--muted)' }}>Update Stage:</label>
-                  <select className="pro-input" style={{ padding: '6px 12px', width: 'auto', background: 'white' }} defaultValue="Cutting">
-                    <option>Sourcing</option>
-                    <option value="Cutting">Cutting</option>
-                    <option>Stitching</option>
-                    <option>QC</option>
-                    <option>Shipping</option>
-                  </select>
-                </div>
-              </div>
-              <ProductionMilestoneTracker currentStage="Cutting" />
-            </div>
-          </div>
-        </article>
-      )
-    }
-
-    if (activeSection === 'Generated Tech-Packs') {
-      // Mock loading from local storage generated by the frontend
-      const storedPacks = JSON.parse(localStorage.getItem('techPacks') || '[]');
-      return (
-        <article className="admin-analytics-card" style={{ marginTop: '20px' }}>
-          <h3>Custom Buyer Tech-Packs</h3>
-          <div className="admin-table-wrap" style={{ overflowX: 'auto', marginTop: '15px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  <th style={{ padding: '12px' }}>Pack ID</th>
-                  <th style={{ padding: '12px' }}>Garment / GSM</th>
-                  <th style={{ padding: '12px' }}>Color / Logo</th>
-                  <th style={{ padding: '12px' }}>Date Generated</th>
-                  <th style={{ padding: '12px' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {storedPacks.length === 0 ? (
-                  <tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: 'var(--muted)' }}>No Tech-Packs generated yet.</td></tr>
-                ) : storedPacks.map(pack => (
-                  <tr key={pack.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px', fontWeight: 'bold', color: 'var(--accent)' }}>{pack.id}</td>
-                    <td style={{ padding: '12px' }}>
-                      <div style={{ fontWeight: 600 }}>{pack.garment}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>{pack.gsm} GSM</div>
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: pack.pantone, border: '1px solid var(--border)' }}></div>
-                        <span style={{ fontSize: '13px', textTransform: 'uppercase' }}>{pack.pantone}</span>
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>Logo: {pack.logo || 'None'}</div>
-                    </td>
-                    <td style={{ padding: '12px', fontSize: '13px' }}>{new Date(pack.date).toLocaleDateString()}</td>
-                    <td style={{ padding: '12px' }}>
-                      <button className="ghost-btn" style={{ padding: '6px 12px', fontSize: '12px', border: '1px solid var(--border)', borderRadius: '6px', background: 'transparent', cursor: 'pointer', color: 'var(--nav-bg)' }}>View Details</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
+    switch(activeSection) {
+      case 'Dashboard': return <DashboardHome stats={stats} recentOrders={data.recentOrders} />;
+      case 'Products': return (
+        <ProductManager 
+          products={data.products} 
+          onAdd={() => { setCurrentProduct(null); setShowProductForm(true); }} 
+          onEdit={(p) => { setCurrentProduct(p); setShowProductForm(true); }}
+          onDelete={handleDeleteProduct}
+        />
       );
+      case 'Orders': return <OrderManager orders={data.orders} onUpdateStatus={(id, status) => alert(`Update Order ${id}`)} />;
+      case 'Customers': return <CustomerList customers={data.buyers} />;
+      case 'Inventory': return <InventoryMatrix products={data.products} />;
+      case 'Categories': return <CategoryManager categories={data.categories} onAdd={(cat) => alert('Add Category')} />;
+      case 'Coupons': return <CouponManager coupons={data.coupons} />;
+      case 'Reviews': return <ReviewModerator reviews={data.reviews} onUpdateStatus={() => alert('Approve Review')} />;
+      case 'Analytics': return <SalesAnalytics stats={stats} />;
+      case 'Reports': return <ReportDownloader />;
+      default: return <div className="pro-card center cap-desc">Coming Soon: {activeSection}</div>;
     }
-
-    // Default Dashboard View
-    return (
-      <>
-        <div className="admin-analytics-cards-row">
-          <article className="admin-analytics-card">
-            <h3>Engagement Rate</h3>
-            <div className="admin-analytics-donut-wrap">
-              <div
-                className="admin-analytics-donut"
-                style={{
-                  background: `radial-gradient(circle closest-side, #fff 72%, transparent 73% 100%), conic-gradient(var(--accent) 0 ${stats.engagementRate * 3.6}deg, #f1f5f9 ${stats.engagementRate * 3.6}deg 360deg)`
-                }}
-              >
-                {stats.engagementRate}%
-              </div>
-              <div className="admin-analytics-lines">
-                <span style={{ width: `${stats.engagementRate}%` }} />
-                <span style={{ width: `${Math.max(0, stats.engagementRate - 20)}%` }} />
-                <span style={{ width: `${Math.max(0, stats.engagementRate - 40)}%` }} />
-              </div>
-            </div>
-          </article>
-
-          <article className="admin-analytics-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0 }}>Inquiry Trends (7 Days)</h3>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--accent)' }}>
-                {stats.trendData.reduce((a, b) => a + b, 0)} Total
-              </span>
-            </div>
-            <div className="admin-analytics-chart">
-              {stats.trendData.map((count, i) => {
-                const max = Math.max(...stats.trendData, 1)
-                const height = (count / max) * 100
-                return <span key={i} style={{ height: `${height}%` }} title={`Day ${i + 1}: ${count}`} />
-              })}
-            </div>
-          </article>
-
-          <article className="admin-analytics-card">
-            <h3>Inventory Summary</h3>
-            <div className="admin-analytics-metrics">
-              <div><span>Total Products</span><em className="is-wide" style={{ width: '100%' }} /></div>
-              <div><span>Pending Samples</span><em style={{ width: '40%', background: '#f59e0b' }} /></div>
-              <div><span>Engaged Buyers</span><em style={{ width: `${stats.engagementRate}%`, background: '#10b981' }} /></div>
-            </div>
-          </article>
-        </div>
-
-        <div className="admin-analytics-grid-bottom">
-          <article className="admin-analytics-card admin-analytics-card--stats">
-            <h3>Key Performance Indicators</h3>
-            <div className="admin-analytics-stats-grid">
-              {statCardsData.map((card) => (
-                <div key={card.label} className="admin-analytics-stat">
-                  <p>{card.label}</p>
-                  <strong style={{ color: card.color }}>{card.value}</strong>
-                  <small style={{ color: card.trend.startsWith('+') ? '#10b981' : '#ef4444' }}>{card.trend}</small>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="admin-analytics-card admin-analytics-card--feed">
-            <div className="admin-analytics-feed-head">
-              <h3>Recent Activity</h3>
-              <span>{loading ? 'Syncing...' : `${recentBuyers.length} records`}</span>
-            </div>
-            <div className="admin-analytics-feed">
-              {loading ? (
-                <p className="admin-analytics-empty">Loading records…</p>
-              ) : recentBuyers.length === 0 ? (
-                <p className="admin-analytics-empty">No inquiries yet.</p>
-              ) : (
-                recentBuyers.slice(0, 4).map((buyer) => (
-                  <div key={buyer._id} className="admin-analytics-feed__item">
-                    <div>
-                      <strong>{buyer.contactPerson}</strong>
-                      <p>{buyer.email}</p>
-                    </div>
-                    <time>{new Date(buyer.submittedAt).toLocaleDateString()}</time>
-                  </div>
-                ))
-              )}
-            </div>
-          </article>
-        </div>
-      </>
-    )
   }
 
   return (
-    <main className="admin-analytics-page">
-      <div className="admin-analytics-shell">
-        <aside className="admin-analytics-sidebar">
-          <div className="admin-analytics-brand">
-            <span className="admin-analytics-brand__dot">◎</span>
-            <span>Garment Admin</span>
-          </div>
-
-          <nav className="admin-analytics-nav">
-            {sidebarItems.map((item) => (
-              <button
-                key={item}
-                className={`admin-analytics-nav__item ${activeSection === item ? 'is-active' : ''}`}
-                onClick={() => setActiveSection(item)}
-              >
-                <span className="admin-analytics-nav__bullet">{activeSection === item ? '✦' : '●'}</span>
-                <span>{item}</span>
-              </button>
-            ))}
-          </nav>
-
-          <div className="admin-analytics-sidebar-footer">
-            <div className="admin-analytics-profile">
-              <div className="admin-analytics-avatar">SA</div>
-              <div className="admin-analytics-profile-info">
-                <div className="admin-analytics-profile__name">Admin Panel</div>
-                <div className="admin-analytics-profile__sub">Administrator</div>
-              </div>
+    <main className="admin-pro-shell" style={{ display: 'flex', height: '100vh', background: '#f8fafc', overflow: 'hidden' }}>
+      {/* Premium Sidebar */}
+      <aside style={{ width: '280px', background: '#0f172a', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '35px 30px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'white' }}>
+            <div style={{ width: '36px', height: '36px', background: 'var(--accent)', borderRadius: '10px', display: 'grid', placeItems: 'center' }}>
+              <Zap size={20} fill="white" color="white" />
             </div>
-            <button className="admin-logout-btn" onClick={() => {
-              apiFetch('/api/admin/logout', { method: 'POST' })
-                .catch(() => null)
-                .finally(() => {
-                  window.location.href = '/admin-login'
-                })
-            }}>
-              <span>Logout</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px' }}>
+              GARMENT<span style={{ color: 'var(--accent)' }}>PRO</span>
+            </span>
+          </div>
+          <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '10px', fontWeight: 700 }}>Admin Cloud v2.5</div>
+        </div>
+
+        <nav style={{ flex: 1, padding: '25px 20px', overflowY: 'auto' }}>
+          {sidebarItems.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => setActiveSection(item.name)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeSection === item.name ? 'rgba(56, 189, 248, 0.1)' : 'transparent',
+                color: activeSection === item.name ? '#38bdf8' : '#94a3b8',
+                cursor: 'pointer',
+                marginBottom: '4px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
+              <item.icon size={20} style={{ opacity: activeSection === item.name ? 1 : 0.6 }} />
+              <span style={{ fontWeight: activeSection === item.name ? 700 : 500, fontSize: '14px' }}>{item.name}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div style={{ padding: '25px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: 'white', marginBottom: '20px' }}>
+            <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '12px', display: 'grid', placeItems: 'center', fontWeight: 800 }}>SA</div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '14px' }}>System Admin</div>
+              <div style={{ fontSize: '11px', color: '#64748b' }}>Master Account</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => window.location.href='/admin-login'}
+            style={{ width: '100%', padding: '12px', borderRadius: '10px', background: '#334155', color: 'white', border: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}
+          >
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <section style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <header style={{ height: '80px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ padding: '8px 12px', background: '#f1f5f9', borderRadius: '10px', color: '#64748b', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%' }}></div>
+              System Live
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
+            <div style={{ position: 'relative', cursor: 'pointer' }}>
+              <Bell size={22} color="#64748b" />
+              {stats.newInquiries > 0 && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-5px', width: '18px', height: '18px', background: '#ef4444', color: 'white', borderRadius: '50%', fontSize: '10px', fontWeight: 900, display: 'grid', placeItems: 'center', border: '2px solid white' }}>
+                  {stats.newInquiries}
+                </span>
+              )}
+            </div>
+            <button 
+              className="icon-btn" 
+              onClick={fetchAllData}
+              disabled={loading}
+              style={{ background: '#f1f5f9', color: 'var(--primary)', padding: '10px', borderRadius: '10px' }}
+            >
+              <RefreshCcw size={20} className={loading ? 'animate-spin' : ''} />
             </button>
           </div>
-        </aside>
+        </header>
 
-        <section className="admin-analytics-main">
-          <header className="admin-analytics-topbar">
-            <div className="admin-analytics-tabs">
-              <button className="admin-analytics-tab is-active">Overview</button>
-              <button className="admin-analytics-tab" onClick={() => setActiveSection('Dashboard')}>Analytics</button>
-              <button className="admin-analytics-tab">System Log</button>
-            </div>
-            <div className="admin-analytics-topbar__actions">
-              <button className="admin-analytics-ghost">Support</button>
-              <button className="admin-analytics-icon">🔔</button>
-              <button className="admin-analytics-icon">⚙</button>
-            </div>
-          </header>
-
-          <div className="admin-analytics-headline">
-            <div>
-              <h1>{activeSection} View</h1>
-              <p>Welcome back! Last sync: {formatShortTime(lastUpdated)}</p>
-            </div>
-            <div className="admin-analytics-headline__actions">
-              <button className="admin-analytics-pill is-primary" onClick={fetchDashboard}>Refresh Data</button>
-              <button className="admin-analytics-pill">Generate Report</button>
-            </div>
-          </div>
-
+        <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
           {liveNotification && (
-            <div className="admin-analytics-error" style={{ marginBottom: '14px', background: 'rgba(16,185,129,.18)', borderColor: 'rgba(16,185,129,.45)', color: '#065f46' }}>
-              {liveNotification}
+            <div className="pro-card animate-slide-in" style={{ marginBottom: '30px', padding: '15px 25px', borderLeft: '5px solid #10b981', background: '#f0fdf4', color: '#065f46', display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <Bell size={20} />
+              <span style={{ fontWeight: 700 }}>{liveNotification}</span>
+              <button 
+                onClick={() => setLiveNotification('')}
+                style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 900 }}
+              >✕</button>
             </div>
           )}
 
-          {error && <div className="admin-analytics-error">{error}</div>}
+          <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <span className="section-subtitle">System Hub / {activeSection}</span>
+              <h1 style={{ margin: '5px 0 0', fontSize: '2.4rem', fontWeight: 900, color: 'var(--primary)', letterSpacing: '-1px' }}>
+                {activeSection}
+              </h1>
+              <p className="cap-desc" style={{ marginTop: '5px' }}>
+                Last synced: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button className="pro-button--compact" style={{ height: '48px', padding: '0 25px', background: 'white', border: '1px solid #e2e8f0', color: 'var(--primary)' }}>
+                View Logs
+              </button>
+              <button className="pro-button" style={{ height: '48px', padding: '0 25px' }}>
+                Quick Action
+              </button>
+            </div>
+          </div>
 
-          {renderContent()}
-        </section>
-      </div>
+          {loading && !lastUpdated ? (
+            <div style={{ height: '300px', display: 'grid', placeItems: 'center' }}>
+              <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: 'var(--primary)', borderRadius: '50%' }}></div>
+            </div>
+          ) : (
+            renderContent()
+          )}
+        </div>
+
+        {showProductForm && (
+          <ProductForm 
+            product={currentProduct} 
+            categories={data.categories}
+            onClose={() => setShowProductForm(false)} 
+            onSave={handleSaveProduct} 
+          />
+        )}
+      </section>
+
+      <style>{`
+        .admin-nav-item:hover {
+          background: rgba(56, 189, 248, 0.05) !important;
+          color: #38bdf8 !important;
+        }
+        @keyframes slideIn {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      `}</style>
     </main>
   )
 }

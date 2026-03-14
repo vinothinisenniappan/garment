@@ -28,29 +28,29 @@ export default function UserLogin() {
     }
 
     return (
-        <main className="user-auth-page">
-            <div className="auth-container">
-                <div className="auth-box glassmorphic">
-                    <header className="auth-header">
-                        <h1>Welcome Back</h1>
-                        <p>Sign in to your buyer account</p>
+        <main className="user-auth-page app--internal" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+            <div className="auth-container" style={{ width: '100%', maxWidth: '450px', padding: '20px' }}>
+                <div className="pro-card" style={{ padding: '40px', boxShadow: '0 20px 50px rgba(15, 23, 42, 0.1)' }}>
+                    <header className="auth-header center" style={{ marginBottom: '30px' }}>
+                        <span className="section-subtitle">Secure Access</span>
+                        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Buyer Portal</h1>
+                        <p className="cap-desc">Manage your orders and specifications</p>
                     </header>
 
                     <form className="pro-form" onSubmit={handleSubmit}>
-                        <div className="pro-field">
+                        <div className="pro-field" style={{ marginBottom: '20px' }}>
                             <label htmlFor="email">Email Address</label>
                             <input
                                 id="email"
                                 type="email"
                                 className="pro-input"
-                                placeholder="Enter your email"
+                                placeholder="name@company.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                autoFocus
                             />
                         </div>
-                        <div className="pro-field">
+                        <div className="pro-field" style={{ marginBottom: '30px' }}>
                             <label htmlFor="password">Password</label>
                             <input
                                 id="password"
@@ -64,25 +64,21 @@ export default function UserLogin() {
                         </div>
 
                         {error && (
-                            <div className="auth-error-msg">
-                                <span>⚠</span> {error}
+                            <div className="error-message" style={{ color: 'var(--accent)', fontWeight: 600, marginBottom: '20px', textAlign: 'center', fontSize: '14px' }}>
+                                {error}
                             </div>
                         )}
 
-                        <button type="submit" className="pro-button primary-btn" disabled={loading}>
-                            <span>{loading ? 'Signing In...' : 'Sign In'}</span>
-                            {!loading && (
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            )}
+                        <button type="submit" className="pro-button" style={{ width: '100%', height: '52px' }} disabled={loading}>
+                            {loading ? 'Sign-in in progress...' : 'Sign In to Portal'}
                         </button>
                     </form>
 
-                    <footer className="auth-footer">
-                        <p>Don't have an account? <Link to="/register">Register Now</Link></p>
+                    <footer className="auth-footer center" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
+                        <p className="cap-desc">Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 600 }}>Create Account</Link></p>
                         <button
-                            className="back-home-btn"
+                            className="filter-btn"
+                            style={{ marginTop: '20px', width: '100%', height: '44px' }}
                             onClick={() => navigate('/')}
                         >
                             ← Back to Home

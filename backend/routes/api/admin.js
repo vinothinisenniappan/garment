@@ -38,6 +38,23 @@ router.post('/products', isAuthenticated, productValidation, adminController.add
 router.put('/products/:id', isAuthenticated, productValidation, adminController.updateProduct);
 router.delete('/products/:id', isAuthenticated, adminController.deleteProduct);
 
+// Category management
+router.get('/categories', isAuthenticated, adminController.getCategories);
+router.post('/categories', isAuthenticated, adminController.addCategory);
+router.delete('/categories/:id', isAuthenticated, adminController.deleteCategory);
+
+// Coupon management
+router.get('/coupons', isAuthenticated, adminController.getCoupons);
+router.post('/coupons', isAuthenticated, adminController.addCoupon);
+
+// Review management
+router.get('/reviews', isAuthenticated, adminController.getReviews);
+router.put('/reviews/:id/status', isAuthenticated, adminController.updateReviewStatus);
+
+// Order management
+router.get('/orders', isAuthenticated, adminController.getOrders);
+router.put('/orders/:id/status', isAuthenticated, adminController.updateOrderStatus);
+
 // Buyer inquiries
 router.get('/buyers', isAuthenticated, adminController.getBuyers);
 router.get('/buyers/:id', isAuthenticated, adminController.getBuyer);

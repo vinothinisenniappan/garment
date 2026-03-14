@@ -21,149 +21,164 @@ export default function TechPackBuilder() {
 
     const handleNext = () => setStep(s => s + 1);
     const handlePrev = () => setStep(s => s - 1);
-
-    if (submitted) {
-        return (
-            <div className="page-container techpack-page">
-                <div className="techpack-success glassmorphic" style={{ maxWidth: '600px', margin: '100px auto', padding: '50px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>✅</div>
-                    <h2 style={{ fontSize: '32px', marginBottom: '15px', color: 'var(--nav-bg)' }}>Tech Pack Generated!</h2>
-                    <p style={{ color: 'var(--muted)', marginBottom: '30px', fontSize: '18px' }}>Your specifications have been saved and sent to our production dashboard.</p>
-                    <button className="pro-btn" onClick={() => { setSubmitted(false); setStep(1); }} style={{ padding: '12px 24px', background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '16px' }}>Create Another</button>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="page-container techpack-page">
-            <div className="techpack-header page-header-overlay">
-                <h1>Custom Tech-Pack Builder</h1>
-                <p>Design your product specifications intuitively in minutes.</p>
-            </div>
-
-            <div className="techpack-builder glassmorphic page-content" style={{ maxWidth: '800px', margin: '40px auto', padding: '40px' }}>
-                <div className="builder-progress" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px', borderBottom: '2px solid var(--border)', paddingBottom: '20px' }}>
-                    <div className="progress-step" style={{ fontWeight: step >= 1 ? 'bold' : 'normal', color: step >= 1 ? 'var(--accent)' : 'var(--muted)' }}>1. Garment</div>
-                    <div className="progress-step" style={{ fontWeight: step >= 2 ? 'bold' : 'normal', color: step >= 2 ? 'var(--accent)' : 'var(--muted)' }}>2. Fabric</div>
-                    <div className="progress-step" style={{ fontWeight: step >= 3 ? 'bold' : 'normal', color: step >= 3 ? 'var(--accent)' : 'var(--muted)' }}>3. Color & Logo</div>
-                    <div className="progress-step" style={{ fontWeight: step >= 4 ? 'bold' : 'normal', color: step >= 4 ? 'var(--accent)' : 'var(--muted)' }}>4. Review</div>
-                </div>
-
-                <div className="builder-content" style={{ minHeight: '300px' }}>
-                    {step === 1 && (
-                        <div className="step-pane animate-fade-in">
-                            <h3 style={{ marginBottom: '20px', fontSize: '24px' }}>Select Base Garment</h3>
-                            <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px' }}>
-                                {['T-Shirt', 'Polo Shirt', 'Hoodie', 'Pyjamas'].map(g => (
-                                    <div
-                                        key={g}
-                                        className="option-card"
-                                        style={{
-                                            padding: '30px',
-                                            border: pack.garment === g ? '2px solid var(--accent)' : '2px solid var(--border)',
-                                            borderRadius: '12px',
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                            background: pack.garment === g ? 'rgba(3,70,148,0.05)' : 'transparent',
-                                            transition: 'all 0.2s',
-                                            fontWeight: 'bold'
-                                        }}
-                                        onClick={() => setPack({ ...pack, garment: g })}
-                                    >
-                                        {g}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 2 && (
-                        <div className="step-pane animate-fade-in">
-                            <h3 style={{ marginBottom: '20px', fontSize: '24px' }}>Select Fabric GSM</h3>
-                            <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '20px' }}>
-                                {['140', '160', '180', '220', '300'].map(g => (
-                                    <div
-                                        key={g}
-                                        className="option-card"
-                                        style={{
-                                            padding: '30px',
-                                            border: pack.gsm === g ? '2px solid var(--accent)' : '2px solid var(--border)',
-                                            borderRadius: '12px',
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                            background: pack.gsm === g ? 'rgba(3,70,148,0.05)' : 'transparent',
-                                            transition: 'all 0.2s',
-                                            fontWeight: 'bold'
-                                        }}
-                                        onClick={() => setPack({ ...pack, gsm: g })}
-                                    >
-                                        {g} GSM
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 3 && (
-                        <div className="step-pane animate-fade-in">
-                            <h3 style={{ marginBottom: '20px', fontSize: '24px' }}>Choose Color & Artwork</h3>
-                            <div className="form-group" style={{ marginBottom: '30px' }}>
-                                <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Pantone / Color</label>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    <input
-                                        type="color"
-                                        value={pack.pantone}
-                                        onChange={(e) => setPack({ ...pack, pantone: e.target.value })}
-                                        style={{ width: '60px', height: '60px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
-                                    />
-                                    <span style={{ fontSize: '18px', fontWeight: 'bold', textTransform: 'uppercase' }}>{pack.pantone}</span>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>Upload Logo (Optional Simulation)</label>
-                                <input
-                                    type="file"
-                                    className="pro-input"
-                                    style={{ width: '100%', padding: '15px', border: '2px dashed var(--border)', borderRadius: '8px', background: 'transparent' }}
-                                    onChange={(e) => setPack({ ...pack, logo: e.target.files[0]?.name || '' })}
-                                />
-                                {pack.logo && <p style={{ marginTop: '10px', color: 'var(--accent)', fontWeight: 'bold' }}>Attached: {pack.logo}</p>}
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 4 && (
-                        <div className="step-pane review-pane animate-fade-in">
-                            <h3 style={{ marginBottom: '20px', fontSize: '24px' }}>Review Specifications</h3>
-                            <pre className="json-preview" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', padding: '20px', borderRadius: '12px', overflowX: 'auto', color: 'var(--nav-bg)', fontFamily: 'monospace', fontSize: '16px' }}>
-                                {JSON.stringify(pack, null, 2)}
-                            </pre>
-                        </div>
-                    )}
-                </div>
-
-                <div className="builder-actions" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
-                    {step > 1 ? (
-                        <button className="ghost-btn" onClick={handlePrev} style={{ padding: '12px 24px', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', color: 'var(--nav-bg)' }}>Back</button>
-                    ) : <div></div>}
-
-                    {step < 4 ? (
-                        <button className="pro-btn" onClick={handleNext} style={{ padding: '12px 24px', background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>Next Step</button>
-                    ) : (
-                        <button className="pro-btn" onClick={handleSubmit} style={{ padding: '12px 24px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>Generate Tech-Pack</button>
-                    )}
-                </div>
-            </div>
-            <style>{`
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+    <main className="techpack-page app--internal">
+      <section className="internal-hero">
+        <div className="internal-hero__inner">
+          <span className="section-subtitle">Intuitive Design</span>
+          <h1 className="internal-hero__title">Tech-Pack Builder</h1>
+          <p>Design your product specifications in minutes with our guided professional builder.</p>
         </div>
-    );
+      </section>
+
+      <div className="page-container" style={{ marginBottom: '80px' }}>
+        {submitted ? (
+          <div className="pro-card center" style={{ maxWidth: '600px', margin: '60px auto' }}>
+            <div style={{ fontSize: '48px', marginBottom: '20px' }}>✓</div>
+            <h2>Tech Pack Generated!</h2>
+            <p className="cap-desc">Your specifications have been saved and sent to our production dashboard.</p>
+            <button className="pro-button" onClick={() => { setSubmitted(false); setStep(1); }} style={{ marginTop: '30px' }}>Create Another Tech Pack</button>
+          </div>
+        ) : (
+          <div className="pro-card" style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div className="builder-header" style={{ marginBottom: '40px' }}>
+              <div className="builder-progress" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                {['Garment', 'Fabric', 'Details', 'Review'].map((label, i) => (
+                  <div key={label} className="progress-step" style={{ 
+                    flex: 1, 
+                    textAlign: 'center',
+                    paddingBottom: '15px',
+                    borderBottom: `3px solid ${step > i ? 'var(--primary)' : 'var(--border)'}`,
+                    color: step > i ? 'var(--primary)' : 'var(--muted)',
+                    fontWeight: step === i + 1 ? '700' : '500',
+                    fontSize: '14px'
+                  }}>
+                    {i + 1}. {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="builder-content" style={{ minHeight: '350px' }}>
+              {step === 1 && (
+                <div className="step-pane">
+                  <div className="section-header">
+                    <span className="section-subtitle">Step 1</span>
+                    <h2>Select Base Garment</h2>
+                  </div>
+                  <div className="grid grid--two">
+                    {['T-Shirt', 'Polo Shirt', 'Hoodie', 'Pyjamas'].map(g => (
+                      <div
+                        key={g}
+                        className={`pro-card pro-card--compact center ${pack.garment === g ? 'is-selected' : ''}`}
+                        style={{ 
+                          cursor: 'pointer',
+                          border: pack.garment === g ? '2px solid var(--primary)' : '1px solid var(--border)',
+                          background: pack.garment === g ? '#F8FAFC' : 'white'
+                        }}
+                        onClick={() => setPack({ ...pack, garment: g })}
+                      >
+                        <h3 style={{ margin: 0 }}>{g}</h3>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 2 && (
+                <div className="step-pane">
+                  <div className="section-header">
+                    <span className="section-subtitle">Step 2</span>
+                    <h2>Fabric Weight (GSM)</h2>
+                  </div>
+                  <div className="grid grid--three">
+                    {['140', '160', '180', '220', '300'].map(g => (
+                      <div
+                        key={g}
+                        className="pro-card pro-card--compact center"
+                        style={{ 
+                          cursor: 'pointer',
+                          border: pack.gsm === g ? '2px solid var(--primary)' : '1px solid var(--border)',
+                          background: pack.gsm === g ? '#F8FAFC' : 'white'
+                        }}
+                        onClick={() => setPack({ ...pack, gsm: g })}
+                      >
+                        <h3 style={{ margin: 0 }}>{g} GSM</h3>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="step-pane">
+                  <div className="section-header">
+                    <span className="section-subtitle">Step 3</span>
+                    <h2>Color & Artwork</h2>
+                  </div>
+                  <div className="pro-form">
+                    <div className="pro-field">
+                      <label>Select Pantone / Color</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <input
+                          type="color"
+                          value={pack.pantone}
+                          onChange={(e) => setPack({ ...pack, pantone: e.target.value })}
+                          style={{ width: '80px', height: '50px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        />
+                        <span className="pro-input" style={{ flex: 1, textTransform: 'uppercase', fontWeight: 600 }}>{pack.pantone}</span>
+                      </div>
+                    </div>
+                    <div className="pro-field">
+                      <label>Upload Artwork Ref (Optional)</label>
+                      <input
+                        type="file"
+                        className="pro-input"
+                        onChange={(e) => setPack({ ...pack, logo: e.target.files[0]?.name || '' })}
+                      />
+                      {pack.logo && <p className="cap-desc" style={{ marginTop: '10px' }}>Attached: <strong>{pack.logo}</strong></p>}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="step-pane">
+                  <div className="section-header">
+                    <span className="section-subtitle">Final Step</span>
+                    <h2>Review Specifications</h2>
+                  </div>
+                  <pre style={{ 
+                    background: '#0F172A', 
+                    color: '#94A3B8', 
+                    padding: '30px', 
+                    borderRadius: '12px', 
+                    fontFamily: 'monospace',
+                    fontSize: '15px',
+                    lineHeight: '1.6',
+                    overflowX: 'auto'
+                  }}>
+                    {JSON.stringify(pack, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            <div className="builder-actions" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', paddingTop: '30px', borderTop: '1px solid var(--border)' }}>
+              {step > 1 ? (
+                <button className="filter-btn" onClick={handlePrev} style={{ height: '48px', padding: '0 30px' }}>Back</button>
+              ) : <div />}
+              
+              {step < 4 ? (
+                <button className="pro-button" onClick={handleNext} style={{ height: '48px', padding: '0 40px' }}>Next Step</button>
+              ) : (
+                <button className="pro-button" onClick={handleSubmit} style={{ height: '48px', padding: '0 40px', background: '#10B981' }}>Generate Tech-Pack</button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
+  );
 }
+
