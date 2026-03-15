@@ -48,26 +48,25 @@ export default function Header() {
         <div className="header-inner">
           <Link to="/" className="brand">SREE ANJANEYA EXPORTS</Link>
           <nav className="nav">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/products" className="nav-link">Products</Link>
-            <Link to="/partnership" className="nav-link">Partnership</Link>
-            {user && (
-              <div className="nav-link dropdown-hover" style={{ position: 'relative', cursor: 'pointer' }}>
-                Tools ▾
-                <div className="dropdown-menu glassmorphic" style={{ position: 'absolute', top: '100%', left: 0, minWidth: '180px', display: 'none', flexDirection: 'column', gap: '8px', padding: '10px', zIndex: 10 }}>
+            {!user ? (
+              // Navigation for NOT logged in users
+              <>
+                <Link to="/" className="nav-link">Home</Link>
+                <Link to="/about" className="nav-link">About</Link>
+                <Link to="/products" className="nav-link">Products</Link>
+                <Link to="/partnership" className="nav-link">Partnership</Link>
+              </>
+            ) : (
+              // Navigation for LOGGED IN users
+              <>
+                <Link to="/" className="nav-link">Home</Link>
+                <Link to="/about" className="nav-link">About</Link>
+                <Link to="/products" className="nav-link">Products</Link>
 
-                  <Link to="/traceability" style={{ color: '#fff', textDecoration: 'none', padding: '5px', fontSize: '14px', whiteSpace: 'nowrap' }}>Traceability Map</Link>
-                  <Link to="/tech-pack-builder" style={{ color: '#fff', textDecoration: 'none', padding: '5px', fontSize: '14px', whiteSpace: 'nowrap' }}>Tech-Pack Builder</Link>
-                </div>
-              </div>
+                <Link to="/buyer-inquiry" className="nav-link">Buyer Inquiry</Link>
+                <Link to="/sample-inquiry" className="nav-link">Sample Inquiry</Link>
+              </>
             )}
-            <style>{`
-            .dropdown-hover:hover .dropdown-menu { display: flex !important; }
-            .dropdown-menu a:hover { color: var(--accent) !important; }
-          `}</style>
-            <Link to="/buyer-inquiry" className="nav-link">Buyer Inquiry</Link>
-            <Link to="/sample-inquiry" className="nav-link">Sample Inquiry</Link>
-            <Link to="/track-sample" className="nav-link">Track Sample</Link>
 
             {user ? (
               <div className="profile-container">
@@ -92,7 +91,7 @@ export default function Header() {
                     </div>
                     <div className="dropdown-divider"></div>
                     <Link to="/inventory" className="dropdown-item">My Inventory</Link>
-                    <Link to="/products" className="dropdown-item">View Products</Link>
+
                     <button onClick={() => logout()} className="dropdown-item logout-item">Logout</button>
                   </div>
                 )}
@@ -113,28 +112,36 @@ export default function Header() {
               <button className="nav-overlay__close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>×</button>
               <div className="nav-overlay__title">Explore</div>
               <div className="nav-overlay__links">
-                <Link to="/" className="nav-overlay__link">Home</Link>
-                <Link to="/history" className="nav-overlay__link">History</Link>
-                <Link to="/products" className="nav-overlay__link">Products</Link>
-                <Link to="/inventory" className="nav-overlay__link">My Inventory</Link>
-                <Link to="/partnership" className="nav-overlay__link">Partnership</Link>
-                <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
-
-                <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
-                <Link to="/sample-inquiry" className="nav-overlay__link">Sample Inquiry</Link>
-                <Link to="/track-sample" className="nav-overlay__link">Track Sample</Link>
-                <Link to="/contact" className="nav-overlay__link">Contact</Link>
-                {user ? (
+                {!user ? (
+                  // Mobile Navigation for NOT logged in users
                   <>
+                    <Link to="/" className="nav-overlay__link">Home</Link>
+                    <Link to="/about" className="nav-overlay__link">About Us</Link>
+                    <Link to="/history" className="nav-overlay__link">History</Link>
+                    <Link to="/products" className="nav-overlay__link">Products</Link>
+                    <Link to="/inventory" className="nav-overlay__link">My Inventory</Link>
+                    <Link to="/partnership" className="nav-overlay__link">Partnership</Link>
+                    <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
+                    <Link to="/contact" className="nav-overlay__link">Contact</Link>
+                    <Link to="/login" className="nav-overlay__link">Login</Link>
+                  </>
+                ) : (
+                  // Mobile Navigation for LOGGED IN users
+                  <>
+                    <Link to="/" className="nav-overlay__link">Home</Link>
+                    <Link to="/about" className="nav-overlay__link">About Us</Link>
+                    <Link to="/products" className="nav-overlay__link">Products</Link>
+                    <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
+                    <Link to="/sample-inquiry" className="nav-overlay__link">Sample Inquiry</Link>
+                    
+                    <div className="nav-overlay__divider"></div>
+                    <Link to="/inventory" className="nav-overlay__link">My Inventory</Link>
 
-                    <Link to="/traceability" className="nav-overlay__link">Traceability Map</Link>
-                    <Link to="/tech-pack-builder" className="nav-overlay__link">Tech-Pack Builder</Link>
+
                     <div className="nav-overlay__divider"></div>
                     <p className="nav-overlay__user-info">Logged in as {user.contactPerson}</p>
                     <button onClick={() => logout()} className="nav-overlay__link" style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: '#FCA5A5' }}>Logout</button>
                   </>
-                ) : (
-                  <Link to="/login" className="nav-overlay__link">Login</Link>
                 )}
               </div>
             </div>

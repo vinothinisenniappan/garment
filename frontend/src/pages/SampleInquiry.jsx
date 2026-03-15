@@ -127,15 +127,15 @@ export default function SampleInquiry() {
               <CheckCircle size={40} />
             </div>
             <h1 style={{ fontSize: '2rem', marginBottom: '15px', color: 'var(--primary)' }}>Sample Requested Successfully!</h1>
-            <p style={{ color: '#64748b', marginBottom: '30px', fontSize: '1.1rem' }}>Your request has been submitted to our production team. You can track its progress live using the ID below.</p>
+            <p style={{ color: '#64748b', marginBottom: '30px', fontSize: '1.1rem' }}>Your request has been submitted to our production team. Please save the ID below for your reference.</p>
             
             <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '2px dashed #cbd5e1', marginBottom: '30px' }}>
-              <span style={{ display: 'block', fontSize: '14px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '5px' }}>Your Tracking ID</span>
+              <span style={{ display: 'block', fontSize: '14px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', marginBottom: '5px' }}>Your Reference ID</span>
               <span style={{ fontSize: '2rem', fontWeight: 900, color: '#0f172a', letterSpacing: '2px' }}>{successId}</span>
             </div>
 
             <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-              <button onClick={() => window.location.href='/track-sample'} className="btn btn--primary">Track Live Status</button>
+
               <button onClick={() => window.location.href='/'} className="btn btn--secondary">Return Home</button>
             </div>
           </div>
@@ -145,14 +145,18 @@ export default function SampleInquiry() {
   }
 
   return (
-    <div className="sample-inquiry-page" style={{ paddingTop: '100px', paddingBottom: '80px', background: '#f8fafc' }}>
-      <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
-        
-        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+    <div className="sample-inquiry-page app--internal" style={{ background: '#f8fafc' }}>
+      <section className="internal-hero">
+        <div className="internal-hero__inner">
           <span className="section-subtitle">Premium Prototyping</span>
-          <h1 className="section-title">Request a Custom Sample</h1>
-          <p className="section-desc">Provide detailed specifications to help us craft your perfect garment sample. This unified process ensures 100% accuracy in pre-production.</p>
+          <h1 className="internal-hero__title">Request a Custom Sample</h1>
+          <p>Provide detailed specifications to help us craft your perfect garment sample. This unified process ensures 100% accuracy in pre-production.</p>
         </div>
+      </section>
+
+      <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '80px' }}>
+        
+    
 
         {error && (
           <div className="pro-card" style={{ padding: '20px', marginBottom: '30px', borderLeft: '5px solid #ef4444', background: '#fef2f2', color: '#b91c1c' }}>
@@ -160,102 +164,105 @@ export default function SampleInquiry() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="premium-form-layout">
+        <form onSubmit={handleSubmit} className="pro-form">
           {/* Section 1 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Info size={20} className="text-accent" /> 1. Buyer & Company Information
-            </h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Profile</span>
+              <h2><Info size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 1. Buyer & Company Information</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field">
                 <label>Full Name *</label>
-                <input type="text" required className="form-input" value={formData.buyer.fullName} onChange={(e) => handleNestedChange('buyer', 'fullName', e.target.value)} />
+                <input type="text" required className="pro-input" value={formData.buyer.fullName} onChange={(e) => handleNestedChange('buyer', 'fullName', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Company / Brand Name *</label>
-                <input type="text" required className="form-input" value={formData.buyer.companyName} onChange={(e) => handleNestedChange('buyer', 'companyName', e.target.value)} />
+                <input type="text" required className="pro-input" value={formData.buyer.companyName} onChange={(e) => handleNestedChange('buyer', 'companyName', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Business Type</label>
-                <select className="form-input" value={formData.buyer.businessType} onChange={(e) => handleNestedChange('buyer', 'businessType', e.target.value)}>
+                <select className="pro-input" value={formData.buyer.businessType} onChange={(e) => handleNestedChange('buyer', 'businessType', e.target.value)}>
                   <option>Retailer</option><option>Wholesaler</option><option>Brand Owner</option><option>Importer</option><option>Startup Brand</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Email Address *</label>
-                <input type="email" required className="form-input" value={formData.buyer.email} onChange={(e) => handleNestedChange('buyer', 'email', e.target.value)} />
+                <input type="email" required className="pro-input" value={formData.buyer.email} onChange={(e) => handleNestedChange('buyer', 'email', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Phone / WhatsApp *</label>
-                <input type="tel" required className="form-input" value={formData.buyer.phone} onChange={(e) => handleNestedChange('buyer', 'phone', e.target.value)} />
+                <input type="tel" required className="pro-input" value={formData.buyer.phone} onChange={(e) => handleNestedChange('buyer', 'phone', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Country *</label>
-                <input type="text" required className="form-input" value={formData.buyer.country} onChange={(e) => handleNestedChange('buyer', 'country', e.target.value)} />
+                <input type="text" required className="pro-input" value={formData.buyer.country} onChange={(e) => handleNestedChange('buyer', 'country', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>City *</label>
-                <input type="text" required className="form-input" value={formData.buyer.city} onChange={(e) => handleNestedChange('buyer', 'city', e.target.value)} />
+                <input type="text" required className="pro-input" value={formData.buyer.city} onChange={(e) => handleNestedChange('buyer', 'city', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Website (optional)</label>
-                <input type="url" className="form-input" value={formData.buyer.website} onChange={(e) => handleNestedChange('buyer', 'website', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. https://mybrand.com" value={formData.buyer.website} onChange={(e) => handleNestedChange('buyer', 'website', e.target.value)} />
               </div>
             </div>
           </div>
 
           {/* Section 2 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Package size={20} className="text-accent" /> 2. Product Details
-            </h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Garment Specs</span>
+              <h2><Package size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 2. Product Details</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field">
                 <label>Product Category</label>
-                <select className="form-input" value={formData.product.category} onChange={(e) => handleNestedChange('product', 'category', e.target.value)}>
+                <select className="pro-input" value={formData.product.category} onChange={(e) => handleNestedChange('product', 'category', e.target.value)}>
                   <option>T-Shirt</option><option>Hoodie</option><option>Shirt</option><option>Jacket</option><option>Kids Wear</option><option>Sports Wear</option><option>Uniform</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Product Type</label>
-                <select className="form-input" value={formData.product.type} onChange={(e) => handleNestedChange('product', 'type', e.target.value)}>
+                <select className="pro-input" value={formData.product.type} onChange={(e) => handleNestedChange('product', 'type', e.target.value)}>
                   <option>Men</option><option>Women</option><option>Kids</option><option>Unisex</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Sample Quantity Required</label>
-                <input type="number" min="1" className="form-input" value={formData.product.quantity} onChange={(e) => handleNestedChange('product', 'quantity', parseInt(e.target.value))} />
+                <input type="number" min="1" className="pro-input" value={formData.product.quantity} onChange={(e) => handleNestedChange('product', 'quantity', parseInt(e.target.value))} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Est. Target Price / Pc ($)</label>
-                <input type="number" step="0.01" className="form-input" placeholder="e.g. 15.50" value={formData.product.targetPrice} onChange={(e) => handleNestedChange('product', 'targetPrice', parseFloat(e.target.value))} />
+                <input type="number" step="0.01" className="pro-input" placeholder="e.g. 15.50" value={formData.product.targetPrice} onChange={(e) => handleNestedChange('product', 'targetPrice', parseFloat(e.target.value))} />
               </div>
             </div>
           </div>
 
           {/* Section 3 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Layers size={20} className="text-accent" /> 3. Fabric Requirements
-            </h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Material</span>
+              <h2><Layers size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 3. Fabric Requirements</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field">
                 <label>Fabric Type</label>
-                <select className="form-input" value={formData.fabric.type} onChange={(e) => handleNestedChange('fabric', 'type', e.target.value)}>
+                <select className="pro-input" value={formData.fabric.type} onChange={(e) => handleNestedChange('fabric', 'type', e.target.value)}>
                   <option>Cotton</option><option>Polyester</option><option>Cotton Polyester Blend</option><option>Linen</option><option>Fleece</option><option>Organic Cotton</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Fabric GSM (Weight)</label>
-                <input type="text" className="form-input" placeholder="e.g. 180 GSM" value={formData.fabric.gsm} onChange={(e) => handleNestedChange('fabric', 'gsm', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. 180 GSM" value={formData.fabric.gsm} onChange={(e) => handleNestedChange('fabric', 'gsm', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Fabric Composition</label>
-                <input type="text" className="form-input" placeholder="e.g. 100% Cotton, 60% Cotton 40% Poly" value={formData.fabric.composition} onChange={(e) => handleNestedChange('fabric', 'composition', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. 100% Cotton, 60% Cotton 40% Poly" value={formData.fabric.composition} onChange={(e) => handleNestedChange('fabric', 'composition', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Fabric Finish</label>
-                <select className="form-input" value={formData.fabric.finish} onChange={(e) => handleNestedChange('fabric', 'finish', e.target.value)}>
+                <select className="pro-input" value={formData.fabric.finish} onChange={(e) => handleNestedChange('fabric', 'finish', e.target.value)}>
                   <option>Washed</option><option>Enzyme Washed</option><option>Bio Washed</option><option>Silicon Washed</option>
                 </select>
               </div>
@@ -263,32 +270,33 @@ export default function SampleInquiry() {
           </div>
 
           {/* Section 4 & 12 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Upload size={20} className="text-accent" /> 4 & 12. Design, Customization & Tech Packs
-            </h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Customization</span>
+              <h2><Upload size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 4 & 12. Design & Tech Packs</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field">
                 <label>Print/Design Type</label>
-                <select className="form-input" value={formData.design.printType} onChange={(e) => handleNestedChange('design', 'printType', e.target.value)}>
+                <select className="pro-input" value={formData.design.printType} onChange={(e) => handleNestedChange('design', 'printType', e.target.value)}>
                   <option>Screen Printing</option><option>Digital Printing</option><option>Heat Transfer</option><option>None</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Logo Placement</label>
-                <input type="text" className="form-input" placeholder="e.g. Left Chest, Center Back" value={formData.design.logoPlacement} onChange={(e) => handleNestedChange('design', 'logoPlacement', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. Left Chest, Center Back" value={formData.design.logoPlacement} onChange={(e) => handleNestedChange('design', 'logoPlacement', e.target.value)} />
               </div>
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="pro-field" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input type="checkbox" id="embroideryReq" style={{ width: '20px', height: '20px' }} checked={formData.design.embroideryRequired} onChange={(e) => handleNestedChange('design', 'embroideryRequired', e.target.checked)} />
                 <label htmlFor="embroideryReq" style={{ margin: 0 }}>Embroidery Required?</label>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Pantone Color Code (optional)</label>
-                <input type="text" className="form-input" placeholder="#FFFFFF or TCX 19-4052" value={formData.design.pantoneColor} onChange={(e) => handleNestedChange('design', 'pantoneColor', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="#FFFFFF or TCX 19-4052" value={formData.design.pantoneColor} onChange={(e) => handleNestedChange('design', 'pantoneColor', e.target.value)} />
               </div>
               
               {/* File Uploads */}
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Upload Tech Pack (PDF/Image)</label>
                 <div style={{ padding: '15px', border: '2px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '15px' }}>
                   <input type="file" accept=".pdf,.png,.jpg,.jpeg,.ai,.psd" onChange={(e) => handleFileUpload('files', 'techPackUrl', e)} />
@@ -296,7 +304,7 @@ export default function SampleInquiry() {
                 </div>
               </div>
 
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Upload Reference/Design Images</label>
                 <div style={{ padding: '15px', border: '2px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '15px' }}>
                   <input type="file" multiple accept=".png,.jpg,.jpeg,.ai" onChange={(e) => handleMultipleFileUpload('files', 'referenceImagesUrls', e)} />
@@ -307,18 +315,19 @@ export default function SampleInquiry() {
           </div>
 
           {/* Section 5 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Ruler size={20} className="text-accent" /> 5. Size Details
-            </h3>
-            <div className="form-grid">
-              <div className="form-group">
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Measurement</span>
+              <h2><Ruler size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 5. Size Details</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field">
                 <label>Size Type</label>
-                <select className="form-input" value={formData.size.type} onChange={(e) => handleNestedChange('size', 'type', e.target.value)}>
+                <select className="pro-input" value={formData.size.type} onChange={(e) => handleNestedChange('size', 'type', e.target.value)}>
                   <option>Standard Size Chart</option><option>Custom Size Chart</option>
                 </select>
               </div>
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', marginBottom: '10px' }}>Sizes Required</label>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {['XS','S','M','L','XL','XXL', '3XL'].map(sz => (
@@ -341,39 +350,40 @@ export default function SampleInquiry() {
                 </div>
               </div>
               {formData.size.type === 'Custom Size Chart' && (
-                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                   <label>Upload Custom Size Chart (Image/PDF)</label>
-                  <input type="file" accept=".pdf,.png,.jpg,.jpeg" className="form-input" style={{ padding: '8px' }} onChange={(e) => handleFileUpload('size', 'sizeChartUrl', e)} />
+                  <input type="file" accept=".pdf,.png,.jpg,.jpeg" className="pro-input" style={{ padding: '8px' }} onChange={(e) => handleFileUpload('size', 'sizeChartUrl', e)} />
                 </div>
               )}
             </div>
           </div>
 
           {/* Section 6 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <FileText size={20} className="text-accent" /> 6. Branding Requirements
-            </h3>
-            <div className="form-grid">
-               <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Trims & Packing</span>
+              <h2><FileText size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 6. Branding Requirements</h2>
+            </div>
+            <div className="grid grid--two">
+               <div className="pro-field" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input type="checkbox" id="brandLabel" style={{ width: '20px', height: '20px' }} checked={formData.branding.customBrandLabel} onChange={(e) => handleNestedChange('branding', 'customBrandLabel', e.target.checked)} />
                 <label htmlFor="brandLabel" style={{ margin: 0 }}>Custom Brand Label</label>
               </div>
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="pro-field" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input type="checkbox" id="neckLabel" style={{ width: '20px', height: '20px' }} checked={formData.branding.neckLabel} onChange={(e) => handleNestedChange('branding', 'neckLabel', e.target.checked)} />
                 <label htmlFor="neckLabel" style={{ margin: 0 }}>Neck Label</label>
               </div>
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="pro-field" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input type="checkbox" id="washCare" style={{ width: '20px', height: '20px' }} checked={formData.branding.washCareLabel} onChange={(e) => handleNestedChange('branding', 'washCareLabel', e.target.checked)} />
                 <label htmlFor="washCare" style={{ margin: 0 }}>Wash Care Label</label>
               </div>
-              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="pro-field" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input type="checkbox" id="hangTag" style={{ width: '20px', height: '20px' }} checked={formData.branding.hangTag} onChange={(e) => handleNestedChange('branding', 'hangTag', e.target.checked)} />
                 <label htmlFor="hangTag" style={{ margin: 0 }}>Hang Tag</label>
               </div>
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Packaging Requirement</label>
-                <select className="form-input" value={formData.branding.packaging} onChange={(e) => handleNestedChange('branding', 'packaging', e.target.value)}>
+                <select className="pro-input" value={formData.branding.packaging} onChange={(e) => handleNestedChange('branding', 'packaging', e.target.value)}>
                   <option>Polybag</option><option>Box Packaging</option><option>Eco Packaging</option>
                 </select>
               </div>
@@ -381,71 +391,78 @@ export default function SampleInquiry() {
           </div>
 
           {/* Sections 7 & 8 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+          <div className="pro-card" style={{ marginBottom: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>7. Sampling Details</h3>
-              <div className="form-group mb-4">
+              <div className="section-header">
+                <span className="section-subtitle">Prototyping</span>
+                <h2>7. Sampling Details</h2>
+              </div>
+              <div className="pro-field mb-4">
                 <label>Sample Type</label>
-                <select className="form-input" value={formData.sampling.type} onChange={(e) => handleNestedChange('sampling', 'type', e.target.value)}>
+                <select className="pro-input" value={formData.sampling.type} onChange={(e) => handleNestedChange('sampling', 'type', e.target.value)}>
                   <option>Prototype Sample</option><option>Fit Sample</option><option>Pre-production Sample</option>
                 </select>
               </div>
-              <div className="form-group mb-4">
+              <div className="pro-field mb-4">
                 <label>Sample Deadline</label>
-                <input type="date" className="form-input" value={formData.sampling.deadline} onChange={(e) => handleNestedChange('sampling', 'deadline', e.target.value)} />
+                <input type="date" className="pro-input" value={formData.sampling.deadline} onChange={(e) => handleNestedChange('sampling', 'deadline', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Sample Budget ($)</label>
-                <input type="number" className="form-input" value={formData.sampling.budget} onChange={(e) => handleNestedChange('sampling', 'budget', parseFloat(e.target.value))} />
+                <input type="number" className="pro-input" value={formData.sampling.budget} onChange={(e) => handleNestedChange('sampling', 'budget', parseFloat(e.target.value))} />
               </div>
             </div>
             
             <div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>8. Target Bulk Order Info</h3>
-              <div className="form-group mb-4">
-                <label>Expected Bulk Quantity</label>
-                <input type="number" className="form-input" value={formData.bulkOrder.expectedQuantity} onChange={(e) => handleNestedChange('bulkOrder', 'expectedQuantity', parseInt(e.target.value))} />
+              <div className="section-header">
+                <span className="section-subtitle">Production</span>
+                <h2>8. Target Bulk Info</h2>
               </div>
-              <div className="form-group mb-4">
+              <div className="pro-field mb-4">
+                <label>Expected Bulk Quantity</label>
+                <input type="number" className="pro-input" value={formData.bulkOrder.expectedQuantity} onChange={(e) => handleNestedChange('bulkOrder', 'expectedQuantity', parseInt(e.target.value))} />
+              </div>
+              <div className="pro-field mb-4">
                 <label>Order Frequency</label>
-                <select className="form-input" value={formData.bulkOrder.frequency} onChange={(e) => handleNestedChange('bulkOrder', 'frequency', e.target.value)}>
+                <select className="pro-input" value={formData.bulkOrder.frequency} onChange={(e) => handleNestedChange('bulkOrder', 'frequency', e.target.value)}>
                   <option>One time</option><option>Monthly</option><option>Seasonal</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Target Production Price ($)</label>
-                <input type="number" step="0.01" className="form-input" value={formData.bulkOrder.targetPrice} onChange={(e) => handleNestedChange('bulkOrder', 'targetPrice', parseFloat(e.target.value))} />
+                <input type="number" step="0.01" className="pro-input" value={formData.bulkOrder.targetPrice} onChange={(e) => handleNestedChange('bulkOrder', 'targetPrice', parseFloat(e.target.value))} />
               </div>
             </div>
           </div>
 
           {/* Section 9 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Truck size={20} className="text-accent" /> 9. Shipping Details
-            </h3>
-            <div className="form-grid">
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Logistics</span>
+              <h2><Truck size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 9. Shipping Details</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Delivery Address</label>
-                <textarea className="form-input" rows="2" value={formData.shipping.address} onChange={(e) => handleNestedChange('shipping', 'address', e.target.value)}></textarea>
+                <textarea className="pro-input" rows="2" value={formData.shipping.address} onChange={(e) => handleNestedChange('shipping', 'address', e.target.value)}></textarea>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Country</label>
-                <input type="text" className="form-input" value={formData.shipping.country} onChange={(e) => handleNestedChange('shipping', 'country', e.target.value)} />
+                <input type="text" className="pro-input" value={formData.shipping.country} onChange={(e) => handleNestedChange('shipping', 'country', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Postal Code</label>
-                <input type="text" className="form-input" value={formData.shipping.postalCode} onChange={(e) => handleNestedChange('shipping', 'postalCode', e.target.value)} />
+                <input type="text" className="pro-input" value={formData.shipping.postalCode} onChange={(e) => handleNestedChange('shipping', 'postalCode', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Preferred Courier</label>
-                <select className="form-input" value={formData.shipping.preferredCourier} onChange={(e) => handleNestedChange('shipping', 'preferredCourier', e.target.value)}>
+                <select className="pro-input" value={formData.shipping.preferredCourier} onChange={(e) => handleNestedChange('shipping', 'preferredCourier', e.target.value)}>
                   <option>DHL</option><option>FedEx</option><option>UPS</option><option>Any</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Shipping Payment</label>
-                <select className="form-input" value={formData.shipping.payment} onChange={(e) => handleNestedChange('shipping', 'payment', e.target.value)}>
+                <select className="pro-input" value={formData.shipping.payment} onChange={(e) => handleNestedChange('shipping', 'payment', e.target.value)}>
                   <option>Buyer Pays (Collect Account)</option><option>Supplier Pays (Include in Invoice)</option>
                 </select>
               </div>
@@ -453,31 +470,33 @@ export default function SampleInquiry() {
           </div>
 
           {/* Section 10 */}
-          <div className="pro-card form-section" style={{ marginBottom: '30px', padding: '30px' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <Info size={20} className="text-accent" /> 10. Additional Notes
-            </h3>
-            <div className="form-grid">
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <div className="pro-card" style={{ marginBottom: '20px' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Details</span>
+              <h2><Info size={20} className="text-accent" style={{ verticalAlign: 'middle', marginRight: '8px' }} /> 10. Additional Notes</h2>
+            </div>
+            <div className="grid grid--two">
+              <div className="pro-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Special Instructions</label>
-                <textarea className="form-input" rows="3" value={formData.notes.specialInstructions} onChange={(e) => handleNestedChange('notes', 'specialInstructions', e.target.value)}></textarea>
+                <textarea className="pro-input" rows="3" value={formData.notes.specialInstructions} onChange={(e) => handleNestedChange('notes', 'specialInstructions', e.target.value)}></textarea>
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Reference Website</label>
-                <input type="url" className="form-input" value={formData.notes.referenceWebsite} onChange={(e) => handleNestedChange('notes', 'referenceWebsite', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. https://reference.com" value={formData.notes.referenceWebsite} onChange={(e) => handleNestedChange('notes', 'referenceWebsite', e.target.value)} />
               </div>
-              <div className="form-group">
+              <div className="pro-field">
                 <label>Competitor Product Link</label>
-                <input type="url" className="form-input" value={formData.notes.competitorLink} onChange={(e) => handleNestedChange('notes', 'competitorLink', e.target.value)} />
+                <input type="text" className="pro-input" placeholder="e.g. https://competitor.com/product" value={formData.notes.competitorLink} onChange={(e) => handleNestedChange('notes', 'competitorLink', e.target.value)} />
               </div>
             </div>
           </div>
 
           {/* Section 11 */}
-          <div className="pro-card form-section" style={{ marginBottom: '40px', padding: '30px', background: '#f8fafc', border: '2px solid #e2e8f0' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', marginBottom: '20px', color: 'var(--primary)' }}>
-              11. Agreement / Confirmation
-            </h3>
+          <div className="pro-card" style={{ marginBottom: '40px', background: 'white' }}>
+            <div className="section-header">
+              <span className="section-subtitle">Final Step</span>
+              <h2>11. Agreement</h2>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 500 }}>
                 <input type="checkbox" required style={{ width: '20px', height: '20px', accentColor: 'var(--primary)' }} checked={formData.agreements.acceptSampleCharges} onChange={(e) => handleNestedChange('agreements', 'acceptSampleCharges', e.target.checked)} />

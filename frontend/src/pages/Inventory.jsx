@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { io } from 'socket.io-client';
+import { apiBaseUrl } from '../lib/api';
 import '../styles.css';
 
 export default function Inventory() {
@@ -30,6 +32,15 @@ export default function Inventory() {
         if (user) {
             fetchOrders();
         }
+
+        const socket = io(apiBaseUrl || window.location.origin, { withCredentials: true });
+        socket.on('orders-updated', () => {
+            if (user) {
+                fetchOrders();
+            }
+        });
+
+        return () => socket.disconnect();
     }, [user]);
 
     const getStatusColor = (status) => {

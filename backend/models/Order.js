@@ -6,6 +6,10 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+    sourceBuyerInquiryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Buyer'
+    },
     inquiryId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Inquiry',

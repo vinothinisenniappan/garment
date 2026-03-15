@@ -17,7 +17,8 @@ import {
   Bell,
   Search,
   RefreshCcw,
-  Zap
+  Zap,
+  ClipboardList
 } from 'lucide-react'
 import { apiBaseUrl, apiFetch } from '../lib/api'
 
@@ -33,6 +34,8 @@ import ReviewModerator from '../components/admin/ReviewModerator'
 import SalesAnalytics from '../components/admin/SalesAnalytics'
 import ReportDownloader from '../components/admin/ReportDownloader'
 import ProductForm from '../components/admin/ProductForm'
+import SampleInquiryManager from '../components/admin/SampleInquiryManager'
+import BuyerInquiryManager from '../components/admin/BuyerInquiryManager'
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('Dashboard')
@@ -71,7 +74,8 @@ export default function AdminDashboard() {
     { name: 'Dashboard', icon: LayoutDashboard },
     { name: 'Products', icon: ShoppingBag },
     { name: 'Orders', icon: ShoppingCart },
-    { name: 'Customers', icon: Users },
+    { name: 'Buyer Inquiries', icon: Users },
+    { name: 'Sample Inquiries', icon: ClipboardList },
     { name: 'Inventory', icon: Boxes },
     { name: 'Categories', icon: Tags },
     { name: 'Coupons', icon: Ticket },
@@ -125,6 +129,7 @@ export default function AdminDashboard() {
       const url = formData._id ? `/api/admin/products/${formData._id}` : '/api/admin/products'
       const res = await apiFetch(url, {
         method,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
       if (res.success) {
@@ -169,7 +174,8 @@ export default function AdminDashboard() {
         />
       );
       case 'Orders': return <OrderManager orders={data.orders} onUpdateStatus={(id, status) => alert(`Update Order ${id}`)} />;
-      case 'Customers': return <CustomerList customers={data.buyers} />;
+      case 'Buyer Inquiries': return <BuyerInquiryManager buyers={data.buyers} onRefresh={fetchAllData} />;
+      case 'Sample Inquiries': return <SampleInquiryManager />;
       case 'Inventory': return <InventoryMatrix products={data.products} />;
       case 'Categories': return <CategoryManager categories={data.categories} onAdd={(cat) => alert('Add Category')} />;
       case 'Coupons': return <CouponManager coupons={data.coupons} />;

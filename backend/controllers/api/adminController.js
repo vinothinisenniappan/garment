@@ -14,6 +14,103 @@ const Coupon = require('../../models/Coupon');
 const Review = require('../../models/Review');
 const { validationResult } = require('express-validator');
 
+const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const extractQuantityFromText = (value) => {
+  const raw = normalizeText(value);
+  if (!raw) {
+    return 1000;
+  }
+
+  const digits = raw.replace(/[^\d]/g, '');
+  const parsed = Number.parseInt(digits, 10);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return 1000;
+};
+
+const buildFabricType = (buyer, product) => {
+  if (product?.fabricType) {
+    return product.fabricType;
+  }
+  const requirementText = normalizeText(buyer.requirements);
+  return requirementText || 'Standard Fabric';
+};
+
+const getPreferredCategories = (buyer) => {
+  if (!Array.isArray(buyer.preferredCategories)) {
+    return [];
+  }
+  return buyer.preferredCategories.filter(Boolean);
+};
+
+const createOrderFromBuyerInquiry = async (buyer) => {
+  const existingOrder = await Order.findOne({ sourceBuyerInquiryId: buyer._id });
+  if (existingOrder) {
+    return { created: false, order: existingOrder, reason: 'existing-order' };
+  }
+
+  const preferredCategories = getPreferredCategories(buyer);
+  const productQuery = { isActive: true };
+  if (preferredCategories.length > 0) {
+    productQuery.category = { $in: preferredCategories };
+  }
+
+  let matchedProduct = await Product.findOne(productQuery).sort({ createdAt: -1 });
+  if (!matchedProduct) {
+    matchedProduct = await Product.findOne({ isActive: true }).sort({ createdAt: -1 });
+  }
+
+  const quantity = extractQuantityFromText(buyer.annualVolume);
+  const itemPrice = matchedProduct?.price || 0;
+  const itemName = matchedProduct?.name || `${preferredCategories[0] || 'General'} Requirement`;
+  const itemSize = matchedProduct?.sizeRange || 'Standard';
+
+  const inquiry = await Inquiry.create({
+    buyerId: buyer._id,
+    fabricType: buildFabricType(buyer, matchedProduct),
+    quantity,
+    status: 'Approved',
+    adminNotes: 'Auto-created from qualified buyer inquiry'
+  });
+
+  const order = await Order.create({
+    sourceBuyerInquiryId: buyer._id,
+    inquiryId: inquiry._id,
+    buyerId: buyer._id,
+    items: [{
+      productId: matchedProduct?._id,
+      name: itemName,
+      size: itemSize,
+      quantity,
+      priceAtPurchase: itemPrice
+    }],
+    totalAmount: itemPrice * quantity,
+    paymentStatus: 'Pending',
+    status: 'Confirmed',
+    currentMilestone: 'Sourcing',
+    milestones: [
+      { stage: 'Sourcing', status: 'In Progress', notes: 'Inquiry confirmed by admin' },
+      { stage: 'Cutting', status: 'Pending' },
+      { stage: 'Stitching', status: 'Pending' },
+      { stage: 'QC', status: 'Pending' },
+      { stage: 'Shipping', status: 'Pending' }
+    ],
+    shippingAddress: {
+      name: buyer.contactPerson || buyer.companyName || 'Buyer',
+      street: buyer.address || 'Address to be confirmed',
+      city: '-',
+      state: '-',
+      zip: '-',
+      country: buyer.country || '-'
+    }
+  });
+
+  return { created: true, order, inquiry };
+};
+
 // Handle admin login
 exports.login = async (req, res) => {
   try {
@@ -319,6 +416,12 @@ exports.addProduct = async (req, res) => {
     const product = new Product(productData);
     await product.save();
 
+    const io = req.app.get('socketio');
+    io?.emit('products-updated', {
+      action: 'created',
+      productId: product._id.toString()
+    });
+
     res.json({
       success: true,
       message: 'Product added successfully',
@@ -378,6 +481,12 @@ exports.updateProduct = async (req, res) => {
       });
     }
 
+    const io = req.app.get('socketio');
+    io?.emit('products-updated', {
+      action: 'updated',
+      productId: product._id.toString()
+    });
+
     res.json({
       success: true,
       message: 'Product updated successfully',
@@ -402,6 +511,13 @@ exports.deleteProduct = async (req, res) => {
         message: 'Product not found'
       });
     }
+
+    const io = req.app.get('socketio');
+    io?.emit('products-updated', {
+      action: 'deleted',
+      productId: req.params.id
+    });
+
     res.json({
       success: true,
       message: 'Product deleted successfully'
@@ -466,11 +582,7 @@ exports.getBuyer = async (req, res) => {
 exports.updateBuyerStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
-    const buyer = await Buyer.findByIdAndUpdate(
-      req.params.id,
-      { status, notes },
-      { new: true }
-    );
+    const buyer = await Buyer.findById(req.params.id);
 
     if (!buyer) {
       return res.status(404).json({
@@ -479,10 +591,40 @@ exports.updateBuyerStatus = async (req, res) => {
       });
     }
 
+    buyer.status = status;
+    if (notes !== undefined) {
+      buyer.notes = notes;
+    }
+    await buyer.save();
+
+    let autoOrder = null;
+    if (status === 'Qualified') {
+      autoOrder = await createOrderFromBuyerInquiry(buyer);
+    }
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.emit('buyer-status-updated', {
+        buyerId: buyer._id,
+        status: buyer.status
+      });
+      if (autoOrder?.created) {
+        io.emit('orders-updated', {
+          buyerId: buyer._id,
+          orderId: autoOrder.order._id,
+          source: 'buyer-inquiry'
+        });
+      }
+    }
+
     res.json({
       success: true,
-      message: 'Buyer status updated successfully',
-      buyer
+      message: autoOrder?.created
+        ? 'Buyer status updated and order created for inventory'
+        : 'Buyer status updated successfully',
+      buyer,
+      autoOrderCreated: Boolean(autoOrder?.created),
+      orderId: autoOrder?.order?._id || null
     });
   } catch (error) {
     console.error('Error updating buyer status:', error);

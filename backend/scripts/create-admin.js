@@ -4,14 +4,12 @@
  */
 
 const mongoose = require('mongoose');
+const path = require('path');
 const Admin = require('../models/Admin');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/garment-export', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(async () => {
   console.log('MongoDB connected');
   

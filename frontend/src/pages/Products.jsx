@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { io } from 'socket.io-client'
 import { apiFetch } from '../lib/api'
 import { Filter, Search, Tag, Layers, ArrowRight, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { apiBaseUrl } from '../lib/api'
 
 export default function Products() {
   const navigate = useNavigate()
@@ -34,6 +36,13 @@ export default function Products() {
     }
 
     fetchProducts()
+
+    const socket = io(apiBaseUrl || window.location.origin, { withCredentials: true })
+    socket.on('products-updated', () => {
+      fetchProducts()
+    })
+
+    return () => socket.disconnect()
   }, [])
 
   const filteredProducts = useMemo(() => {
@@ -46,36 +55,76 @@ export default function Products() {
     })
   }, [products, selectedCategory, searchQuery])
 
+  const activeProducts = products.filter(product => product.isActive !== false).length
+
   return (
     <main className="products-page app--internal">
-      {/* Premium Hero Section */}
-      <section className="internal-hero" style={{ background: 'linear-gradient(135deg, #ffffffff 0%, #ffffffff 100%)', color: 'white', padding: '80px 0 60px' }}>
-        <div className="internal-hero__inner scale-reveal" style={{ textAlign: 'center' }}>
-          <span className="section-subtitle" style={{ color: 'var(--primary-light)', fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '12x', marginTop:'30px' ,display: 'block' }}>Excellence in Textiles</span>
-          <h1 className="internal-hero__title" style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '20px' }}>Production Catalog</h1>
-          <p style={{ maxWidth: '700px', margin: '0 auto', opacity: '0.8', fontSize: '1.1rem', lineHeight: '1.6' }}>
-            Precision-engineered garments tailored for global retail leaders and Boutique brands. 
-            Real-time specifications and live inventory overview.
-          </p>
+      <section
+        className="internal-hero"
+        style={{
+          padding: 'calc(var(--header-height) + 34px) 0 34px',
+          marginBottom: 0,
+          background: 'linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)'
+        }}
+      >
+        <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
+          <div
+            className="pro-card scale-reveal"
+            style={{
+              padding: '34px',
+              borderRadius: '30px',
+              background: 'linear-gradient(135deg, rgba(15, 46, 90, 0.98) 0%, rgba(21, 79, 149, 0.94) 62%, rgba(56, 189, 248, 0.88) 100%)',
+              color: '#fff',
+              boxShadow: '0 26px 60px rgba(15, 46, 90, 0.18)',
+              border: '1px solid rgba(255,255,255,0.14)'
+            }}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.8fr)', gap: '24px', alignItems: 'end' }}>
+              <div style={{ textAlign: 'left' }}>
+                <span style={{ color: 'rgba(255,255,255,0.76)', fontSize: '0.78rem', letterSpacing: '0.22em', textTransform: 'uppercase', display: 'inline-block', marginBottom: '12px', fontWeight: 700 }}>
+                  Precision Catalogue
+                </span>
+                <h1 className="internal-hero__title" style={{ fontSize: 'clamp(2.3rem, 4vw, 4.1rem)', fontWeight: 900, marginBottom: '14px', color: '#fff', letterSpacing: '-0.04em', textTransform: 'none', lineHeight: 1.02 }}>
+                  Production Catalog
+                </h1>
+                <p style={{ maxWidth: '720px', margin: 0, color: 'rgba(255,255,255,0.84)', fontSize: '1rem', lineHeight: '1.7' }}>
+                  Factory-ready garments arranged as a buyer-first collection with cleaner filtering, faster scanning, and live inventory-backed updates from the admin panel.
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
+                <div style={{ padding: '18px', borderRadius: '20px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.72)', marginBottom: '8px' }}>Live Range</div>
+                  <div style={{ fontSize: '1.9rem', fontWeight: 900 }}>{activeProducts}</div>
+                  <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.85rem' }}>active styles</div>
+                </div>
+                <div style={{ padding: '18px', borderRadius: '20px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.72)', marginBottom: '8px' }}>Collections</div>
+                  <div style={{ fontSize: '1.9rem', fontWeight: 900 }}>{Math.max(categories.length - 1, 0)}</div>
+                  <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.85rem' }}>category groups</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="page-container" style={{ marginTop: '-120px', marginBottom: '80px' }}>
-        {/* Glassmorphism Filter Bar */}
-        <section className="reveal-on-scroll" style={{ marginBottom: '40px' }}>
+      <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto 88px', padding: '28px 24px 0' }}>
+        <section className="reveal-on-scroll" style={{ marginBottom: '34px' }}>
           <div className="pro-card" style={{ 
-            padding: '20px 32px', 
-            borderRadius: '24px', 
+            padding: '22px 24px', 
+            borderRadius: '28px', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between', 
             gap: '30px', 
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-            background: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.3)'
+            boxShadow: '0 18px 44px rgba(15, 46, 90, 0.08)',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(18px)',
+            border: '1px solid rgba(15, 46, 90, 0.08)',
+            flexWrap: 'wrap'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto', paddingBottom: '4px', flexGrow: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto', paddingBottom: '4px', flexGrow: 1, minWidth: 'min(100%, 520px)' }}>
               <Filter size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
               <div style={{ display: 'flex', gap: '8px' }}>
                 {categories.map(cat => (
@@ -103,7 +152,7 @@ export default function Products() {
               </div>
             </div>
             
-            <div style={{ position: 'relative', minWidth: '320px' }}>
+            <div style={{ position: 'relative', minWidth: 'min(100%, 340px)', flex: '1 1 320px', maxWidth: '420px' }}>
               <Search size={18} style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
               <input 
                 type="text" 
@@ -141,7 +190,7 @@ export default function Products() {
             </div>
           )}
           
-          <div className="grid grid--three" style={{ gap: '40px' }}>
+          <div className="grid grid--three" style={{ gap: '28px' }}>
             {loading ? (
               [1, 2, 3].map(i => (
                 <div key={i} className="skeleton" style={{ height: '500px', borderRadius: '24px', background: '#f1f5f9' }}></div>
@@ -170,7 +219,7 @@ export default function Products() {
                   cursor: 'pointer',
                   border: '1px solid #f1f5f9'
                 }}>
-                  <div style={{ position: 'relative', height: '360px', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', height: '320px', overflow: 'hidden', background: 'linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%)' }}>
                     {p.images?.[0] ? (
                       <img 
                         src={p.images[0]} 
@@ -190,10 +239,10 @@ export default function Products() {
                     </div>
                   </div>
                   
-                  <div style={{ padding: '30px', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '12px', color: 'var(--secondary)' }}>{p.name}</h3>
+                  <div style={{ padding: '26px', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '12px', color: 'var(--secondary)', lineHeight: 1.15 }}>{p.name}</h3>
                     
-                    <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted)', fontSize: '0.85rem' }}>
                         <Layers size={14} /> <span>{p.fabricType}</span>
                       </div>
@@ -202,7 +251,7 @@ export default function Products() {
                       </div>
                     </div>
 
-                    <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ marginTop: 'auto', paddingTop: '22px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>Size Range</span>
                          <span style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--secondary)' }}>{p.sizeRange}</span>
@@ -221,8 +270,8 @@ export default function Products() {
       
       <style>{`
         .product-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+          transform: translateY(-8px);
+          box-shadow: 0 24px 50px rgba(15, 46, 90, 0.14);
         }
         .product-card:hover .product-image {
           transform: scale(1.05);
@@ -237,6 +286,11 @@ export default function Products() {
           0% { background-color: #f1f5f9; }
           50% { background-color: #e2e8f0; }
           100% { background-color: #f1f5f9; }
+        }
+        @media (max-width: 900px) {
+          .products-page .internal-hero__title {
+            font-size: 2.4rem !important;
+          }
         }
       `}</style>
     </main>

@@ -1,23 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Save, Trash2, Plus } from 'lucide-react';
+import { X, Upload, Save } from 'lucide-react';
+
+const DEFAULT_CATEGORIES = ['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear'];
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+    reader.readAsDataURL(file);
+  });
+}
 
 const ProductForm = ({ product, categories, onClose, onSave }) => {
+  const categoryList = (categories && categories.length > 0)
+    ? categories.map(c => typeof c === 'string' ? c : c.name)
+    : DEFAULT_CATEGORIES;
+
   const [formData, setFormData] = useState({
     name: '',
     category: 'T-shirts',
     price: '',
     fabricType: '',
     gsm: '',
-    sizeRange: '',
+    sizeRange: 'S - XXL',
+    images: [],
     isActive: true,
     isFeatured: false,
     inventory: { S: 0, M: 0, L: 0, XL: 0 }
   });
+  const [imageError, setImageError] = useState('');
+  const [imageUrlInput, setImageUrlInput] = useState('');
 
   useEffect(() => {
     if (product) {
       setFormData({
         ...product,
+        images: Array.isArray(product.images) ? product.images : [],
         inventory: product.inventory || { S: 0, M: 0, L: 0, XL: 0 }
       });
     }
@@ -35,6 +55,52 @@ const ProductForm = ({ product, categories, onClose, onSave }) => {
     setFormData(prev => ({
       ...prev,
       inventory: { ...prev.inventory, [size]: parseInt(val) || 0 }
+    }));
+  };
+
+  const handleImageSelection = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setImageError('');
+
+    const oversizedFile = files.find(file => file.size > MAX_IMAGE_SIZE_BYTES);
+    if (oversizedFile) {
+      setImageError(`${oversizedFile.name} is larger than 2 MB. Use a smaller image.`);
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      const encodedImages = await Promise.all(files.map(readFileAsDataUrl));
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...encodedImages]
+      }));
+    } catch (error) {
+      setImageError(error.message || 'Failed to load selected image');
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const handleAddImageUrl = () => {
+    const nextUrl = imageUrlInput.trim();
+    if (!nextUrl) {
+      return;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, nextUrl]
+    }));
+    setImageUrlInput('');
+  };
+
+  const removeImage = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, index) => index !== indexToRemove)
     }));
   };
 
@@ -65,7 +131,7 @@ const ProductForm = ({ product, categories, onClose, onSave }) => {
                 <div className="pro-field">
                   <label>Category</label>
                   <select name="category" value={formData.category} onChange={handleChange} className="pro-input">
-                    {categories.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+                    {categoryList.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div className="pro-field">
@@ -82,6 +148,10 @@ const ProductForm = ({ product, categories, onClose, onSave }) => {
                   <label>GSM</label>
                   <input name="gsm" value={formData.gsm} onChange={handleChange} className="pro-input" placeholder="180" />
                 </div>
+              </div>
+              <div className="pro-field">
+                <label>Size Range</label>
+                <input name="sizeRange" value={formData.sizeRange} onChange={handleChange} className="pro-input" placeholder="S - XXL" required />
               </div>
               <div className="pro-field">
                 <label>Inventory Map (Size-wise Units)</label>
@@ -105,11 +175,79 @@ const ProductForm = ({ product, categories, onClose, onSave }) => {
             <div style={{ display: 'grid', gap: '20px' }}>
               <div className="pro-field">
                 <label>Product Visuals</label>
-                <div style={{ height: '200px', border: '2px dashed #E2E8F0', borderRadius: '16px', display: 'grid', placeItems: 'center', background: '#F8FAFC' }}>
+                <label
+                  htmlFor="product-image-upload"
+                  style={{
+                    height: '200px',
+                    border: '2px dashed #E2E8F0',
+                    borderRadius: '16px',
+                    display: 'grid',
+                    placeItems: 'center',
+                    background: '#F8FAFC',
+                    cursor: 'pointer'
+                  }}
+                >
                   <div style={{ textAlign: 'center' }}>
                     <Upload size={40} color="#94A3B8" />
-                    <p className="cap-desc" style={{ marginTop: '10px' }}>Add product images here</p>
+                    <p className="cap-desc" style={{ marginTop: '10px' }}>Click to add product images</p>
+                    <p className="cap-desc" style={{ fontSize: '12px' }}>PNG, JPG, WEBP up to 2 MB each</p>
                   </div>
+                  <input
+                    id="product-image-upload"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    multiple
+                    onChange={handleImageSelection}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+                {imageError && (
+                  <div style={{ color: '#dc2626', fontSize: '13px', fontWeight: 600, marginTop: '8px' }}>
+                    {imageError}
+                  </div>
+                )}
+                {formData.images.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', marginTop: '12px' }}>
+                    {formData.images.map((image, index) => (
+                      <div key={`${index}-${image.slice(0, 20)}`} style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '1px solid #E2E8F0', background: '#fff' }}>
+                        <img src={image} alt={`Preview ${index + 1}`} style={{ width: '100%', height: '90px', objectFit: 'cover', display: 'block' }} />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          style={{
+                            position: 'absolute',
+                            top: '6px',
+                            right: '6px',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '999px',
+                            border: 'none',
+                            background: 'rgba(15, 23, 42, 0.8)',
+                            color: '#fff',
+                            display: 'grid',
+                            placeItems: 'center',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+                  <input
+                    className="pro-input"
+                    value={imageUrlInput}
+                    onChange={(e) => setImageUrlInput(e.target.value)}
+                    placeholder="Optional: paste a hosted image URL"
+                  />
+                  <button type="button" className="pro-button--secondary" onClick={handleAddImageUrl} style={{ minWidth: '96px' }}>
+                    Add URL
+                  </button>
+                </div>
+                <div className="cap-desc" style={{ fontSize: '12px', marginTop: '6px' }}>
+                  Uploaded files are stored as product image data; pasted URLs also work.
                 </div>
               </div>
               <div className="pro-field" style={{ padding: '20px', background: '#F8FAFC', borderRadius: '16px' }}>

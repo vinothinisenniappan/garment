@@ -15,7 +15,7 @@ const loginValidation = [
 
 const productValidation = [
   body('name').trim().notEmpty().withMessage('Product name is required'),
-  body('category').isIn(['T-shirts', 'Gents Wear', 'Ladies Wear', 'Kids Wear']).withMessage('Valid category is required'),
+  body('category').isIn(['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear']).withMessage('Valid category is required'),
   body('fabricType').trim().notEmpty().withMessage('Fabric type is required'),
   body('gsm').trim().notEmpty().withMessage('GSM is required'),
   body('sizeRange').trim().notEmpty().withMessage('Size range is required')

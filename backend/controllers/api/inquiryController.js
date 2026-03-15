@@ -6,6 +6,7 @@
 const Buyer = require('../../models/Buyer');
 const { validationResult } = require('express-validator');
 const { sendInquiryNotificationEmail } = require('../../utils/mailer');
+const crypto = require('crypto');
 
 // Submit inquiry form
 exports.submitInquiry = async (req, res) => {
@@ -33,7 +34,9 @@ exports.submitInquiry = async (req, res) => {
       annualVolume: req.body.annualVolume,
       preferredCategories: Array.isArray(req.body.preferredCategories)
         ? req.body.preferredCategories
-        : req.body.preferredCategories ? [req.body.preferredCategories] : []
+        : req.body.preferredCategories ? [req.body.preferredCategories] : [],
+      // Inquiry submissions don't have a password; generate a secure temporary one
+      password: crypto.randomBytes(16).toString('hex')
     };
 
     const buyer = new Buyer(buyerData);
