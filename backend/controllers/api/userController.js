@@ -70,11 +70,25 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+
         const buyer = await Buyer.findOne({ email: email.toLowerCase() });
         if (!buyer) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
+            });
+        }
+
+        if (!buyer.password) {
+            return res.status(401).json({
+                success: false,
+                message: 'This account does not have a login password. Please register or contact support.'
             });
         }
 

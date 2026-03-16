@@ -11,15 +11,37 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+const isProduction = process.env.NODE_ENV === 'production';
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+// Allow multiple frontend origins in production: comma-separated in CLIENT_URL
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (isProduction) {
+  // Required on Render/behind proxy for secure cookies to work correctly
+  app.set('trust proxy', 1);
+}
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
+if (!mongoUri) {
+  console.error('MongoDB connection error: Missing MONGODB_URI/MONGO_URI environment variable');
+} else {
+  mongoose.connect(mongoUri)
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch(err => console.error('MongoDB connection error:', err));
+}
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin(origin, callback) {
+    // Allow same-origin/no-origin requests (health checks, server-side calls)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '15mb' }));
@@ -34,7 +56,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to true in production with HTTPS
+    // Cross-site cookies in production require SameSite=None + Secure
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -82,7 +106,7 @@ const server = app.listen(PORT, () => {
 // Socket.io initialization
 const io = require('socket.io')(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true
   }
