@@ -9,6 +9,7 @@ export default function SampleInquiryManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInquiry, setSelectedInquiry] = useState(null);
   const [inventoryLink, setInventoryLink] = useState([]);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -27,6 +28,7 @@ export default function SampleInquiryManager() {
   }, []);
 
   const handleUpdateStatus = async (id, newStatus) => {
+    setUpdatingStatus(true);
     try {
       const res = await apiFetch(`/api/sample-inquiries/${id}`, {
         method: 'PATCH',
@@ -34,11 +36,13 @@ export default function SampleInquiryManager() {
         body: JSON.stringify({ status: newStatus })
       });
       if (res.success) {
-        setInquiries(inquiries.map(i => i._id === id ? res.inquiry : i));
+        setInquiries(prev => prev.map(i => i._id === id ? res.inquiry : i));
         if (selectedInquiry?._id === id) setSelectedInquiry(res.inquiry);
       }
     } catch (error) {
-      alert('Failed to update status');
+      alert(`Failed to update status: ${error.message}`);
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -78,6 +82,8 @@ export default function SampleInquiryManager() {
     }
   };
 
+  const formatINR = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+
   if (selectedInquiry) {
     return (
       <div className="pro-card animate-slide-in" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -95,17 +101,32 @@ export default function SampleInquiryManager() {
             </div>
             <p className="cap-desc" style={{ margin: 0 }}>Submitted by {selectedInquiry.buyer?.fullName} ({selectedInquiry.buyer?.companyName}) on {new Date(selectedInquiry.createdAt).toLocaleString()}</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <select 
-              value={selectedInquiry.status} 
-              onChange={(e) => handleUpdateStatus(selectedInquiry._id, e.target.value)}
-              style={{ padding: '10px 15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontWeight: 600, color: '#0f172a' }}
-            >
-              <option>Pending</option>
-              <option>Under Review</option>
-              <option>Sample in Development</option>
-              <option>Shipped</option>
-            </select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              {['Pending', 'Under Review', 'Sample in Development', 'Shipped'].map((status) => {
+                const isActive = selectedInquiry.status === status;
+                return (
+                  <button
+                    key={status}
+                    onClick={() => handleUpdateStatus(selectedInquiry._id, status)}
+                    disabled={isActive || updatingStatus}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '999px',
+                      border: isActive ? '1px solid #4f46e5' : '1px solid #cbd5e1',
+                      background: isActive ? '#e0e7ff' : 'white',
+                      color: isActive ? '#4338ca' : '#0f172a',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: isActive || updatingStatus ? 'not-allowed' : 'pointer',
+                      opacity: updatingStatus && !isActive ? 0.6 : 1
+                    }}
+                  >
+                    {status}
+                  </button>
+                );
+              })}
+            </div>
             <button onClick={() => setSelectedInquiry(null)} className="btn btn--secondary" style={{ padding: '0 20px' }}>Back to List</button>
           </div>
         </div>
@@ -129,7 +150,7 @@ export default function SampleInquiryManager() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
                 <div><label className="cap-desc">Category</label><div style={{ fontWeight: 600 }}>{selectedInquiry.product?.category} - {selectedInquiry.product?.type}</div></div>
                 <div><label className="cap-desc">Quantity</label><div style={{ fontWeight: 600 }}>{selectedInquiry.product?.quantity} units</div></div>
-                <div><label className="cap-desc">Target Price</label><div style={{ fontWeight: 600 }}>${selectedInquiry.product?.targetPrice}</div></div>
+                <div><label className="cap-desc">Target Price</label><div style={{ fontWeight: 600 }}>{formatINR(selectedInquiry.product?.targetPrice)}</div></div>
                 
                 <div><label className="cap-desc">Fabric</label><div style={{ fontWeight: 600 }}>{selectedInquiry.fabric?.type}</div></div>
                 <div><label className="cap-desc">GSM & Comp.</label><div>{selectedInquiry.fabric?.gsm} | {selectedInquiry.fabric?.composition}</div></div>
@@ -219,7 +240,7 @@ export default function SampleInquiryManager() {
              {/* Shipping & Orders */}
              <div className="pro-card" style={{ padding: '25px' }}>
               <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>Logistics</h3>
-              <div style={{ fontSize: '14px', marginBottom: '10px' }}><strong>Bulk Target:</strong> {selectedInquiry.bulkOrder?.expectedQuantity} pcs ({selectedInquiry.bulkOrder?.frequency}) at ${selectedInquiry.bulkOrder?.targetPrice}</div>
+              <div style={{ fontSize: '14px', marginBottom: '10px' }}><strong>Bulk Target:</strong> {selectedInquiry.bulkOrder?.expectedQuantity} pcs ({selectedInquiry.bulkOrder?.frequency}) at {formatINR(selectedInquiry.bulkOrder?.targetPrice)}</div>
               <div style={{ fontSize: '14px', marginBottom: '10px' }}><strong>Shipping:</strong> {selectedInquiry.shipping?.address}, {selectedInquiry.shipping?.country} - {selectedInquiry.shipping?.postalCode}</div>
               <div style={{ fontSize: '14px', marginBottom: '10px' }}><strong>Courier:</strong> {selectedInquiry.shipping?.preferredCourier} ({selectedInquiry.shipping?.payment})</div>
             </div>
@@ -239,7 +260,7 @@ export default function SampleInquiryManager() {
             <Search size={18} style={{ position: 'absolute', top: '50%', left: '15px', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input 
               type="text" 
-              className="form-input" 
+              className="pro-input" 
               placeholder="Search by ID, Buyer Name, or Company..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -249,7 +270,7 @@ export default function SampleInquiryManager() {
           <div style={{ position: 'relative' }}>
              <Filter size={18} style={{ position: 'absolute', top: '50%', left: '15px', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
              <select 
-                className="form-input" 
+               className="pro-input" 
                 value={filter} 
                 onChange={(e) => setFilter(e.target.value)}
                 style={{ paddingLeft: '45px', width: '200px', background: 'white', border: '1px solid #e2e8f0' }}

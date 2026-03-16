@@ -37,7 +37,6 @@ export default function Footer() {
             <ul>
               <li><Link to="/buyer-inquiry">Buyer Inquiry</Link></li>
               <li><Link to="/sample-inquiry">Sample Inquiry</Link></li>
-              <li><Link to="/inventory">Inventory Management</Link></li>
             </ul>
           </nav>
 

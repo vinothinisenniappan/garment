@@ -90,8 +90,8 @@ export default function Header() {
                       <p className="user-email">{user.email}</p>
                     </div>
                     <div className="dropdown-divider"></div>
-                    <Link to="/inventory" className="dropdown-item">My Inventory</Link>
-
+                    <Link to="/profile" className="dropdown-item">My Profile</Link>
+                    <Link to="/inventory" className="dropdown-item">Orders & Tracking</Link>
                     <button onClick={() => logout()} className="dropdown-item logout-item">Logout</button>
                   </div>
                 )}
@@ -119,7 +119,6 @@ export default function Header() {
                     <Link to="/about" className="nav-overlay__link">About Us</Link>
                     <Link to="/history" className="nav-overlay__link">History</Link>
                     <Link to="/products" className="nav-overlay__link">Products</Link>
-                    <Link to="/inventory" className="nav-overlay__link">My Inventory</Link>
                     <Link to="/partnership" className="nav-overlay__link">Partnership</Link>
                     <Link to="/infrastructure" className="nav-overlay__link">Infrastructure</Link>
                     <Link to="/contact" className="nav-overlay__link">Contact</Link>
@@ -133,10 +132,8 @@ export default function Header() {
                     <Link to="/products" className="nav-overlay__link">Products</Link>
                     <Link to="/buyer-inquiry" className="nav-overlay__link">Buyer Inquiry</Link>
                     <Link to="/sample-inquiry" className="nav-overlay__link">Sample Inquiry</Link>
-                    
-                    <div className="nav-overlay__divider"></div>
-                    <Link to="/inventory" className="nav-overlay__link">My Inventory</Link>
-
+                    <Link to="/profile" className="nav-overlay__link">My Profile</Link>
+                    <Link to="/inventory" className="nav-overlay__link">Orders & Tracking</Link>
 
                     <div className="nav-overlay__divider"></div>
                     <p className="nav-overlay__user-info">Logged in as {user.contactPerson}</p>

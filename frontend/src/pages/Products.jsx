@@ -99,6 +99,7 @@ export default function Products() {
               </div>
             </div>
           </div>
+
         <section className="reveal-on-scroll" style={{ marginBottom: '34px' }}>
           <div className="pro-card" style={{ 
             padding: '22px 24px', 
@@ -221,10 +222,15 @@ export default function Products() {
                         <Tag size={40} opacity={0.2} />
                       </div>
                     )}
-                    <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
+                    <div style={{ position: 'absolute', top: '20px', left: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                        <span style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', color: 'var(--primary)', borderRadius: '50px', fontSize: '0.75rem', fontWeight: '800', boxShadow: 'var(--shadow-sm)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                          {p.category}
                        </span>
+                       {p.exportDestination && (
+                         <span style={{ padding: '6px 14px', background: 'rgba(15,46,90,0.88)', backdropFilter: 'blur(10px)', color: '#90caf9', borderRadius: '50px', fontSize: '0.7rem', fontWeight: '700', boxShadow: 'var(--shadow-sm)', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                           🌍 Exported · {p.exportDestination}
+                         </span>
+                       )}
                     </div>
                   </div>
                   

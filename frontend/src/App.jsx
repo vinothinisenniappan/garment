@@ -25,6 +25,7 @@ import Partnership from './pages/Partnership'
 import QualityPolicy from './pages/QualityPolicy'
 import Inventory from './pages/Inventory'
 import SampleInquiry from './pages/SampleInquiry'
+import BuyerProfile from './pages/BuyerProfile'
 
 export default function App() {
   const location = useLocation();
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/quality-policy" element={<QualityPolicy />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/sample-inquiry" element={<RequireUserAuth><SampleInquiry /></RequireUserAuth>} />
+          <Route path="/profile" element={<RequireUserAuth><BuyerProfile /></RequireUserAuth>} />
 
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />

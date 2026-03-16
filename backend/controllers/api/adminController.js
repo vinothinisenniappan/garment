@@ -12,6 +12,7 @@ const Inquiry = require('../../models/Inquiry');
 const Category = require('../../models/Category');
 const Coupon = require('../../models/Coupon');
 const Review = require('../../models/Review');
+const { sendOrderConfirmation, sendStatusUpdate, sendInquiryAcceptedEmail } = require('../../utils/mailer');
 const { validationResult } = require('express-validator');
 
 const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
@@ -107,6 +108,13 @@ const createOrderFromBuyerInquiry = async (buyer) => {
       country: buyer.country || '-'
     }
   });
+
+  // Send order confirmation email
+  try {
+    await sendOrderConfirmation(buyer.email, buyer.contactPerson, order._id);
+  } catch (mailError) {
+    console.error('[EMAIL] Failed to send auto-order confirmation email:', mailError.message);
+  }
 
   return { created: true, order, inquiry };
 };
@@ -582,7 +590,15 @@ exports.getBuyer = async (req, res) => {
 exports.updateBuyerStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
-    const buyer = await Buyer.findById(req.params.id);
+
+    const updateFields = { status };
+    if (notes !== undefined) updateFields.notes = notes;
+
+    const buyer = await Buyer.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true, runValidators: false }
+    );
 
     if (!buyer) {
       return res.status(404).json({
@@ -591,11 +607,12 @@ exports.updateBuyerStatus = async (req, res) => {
       });
     }
 
-    buyer.status = status;
-    if (notes !== undefined) {
-      buyer.notes = notes;
+    // Send status update email
+    try {
+      await sendStatusUpdate(buyer.email, buyer.contactPerson, 'Inquiry', status, buyer._id);
+    } catch (mailError) {
+      console.error('[EMAIL] Failed to send buyer status update email:', mailError.message);
     }
-    await buyer.save();
 
     let autoOrder = null;
     if (status === 'Qualified') {
@@ -641,6 +658,7 @@ exports.getInquiries = async (req, res) => {
   try {
     const inquiries = await Inquiry.find()
       .populate('productId', 'name category price sizeRange')
+      .populate('buyerId', 'companyName contactPerson email phone')
       .sort({ createdAt: -1 });
     res.json({
       success: true,
@@ -651,6 +669,143 @@ exports.getInquiries = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error loading inquiries',
+      error: error.message
+    });
+  }
+};
+
+exports.updateInquiryStatus = async (req, res) => {
+  try {
+    const { status, adminNotes } = req.body;
+    const allowedStatuses = ['Pending', 'Accepted', 'Approved', 'Rejected', 'Confirmed', 'Converted to Order', 'Shipped'];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid inquiry status' });
+    }
+
+    const inquiry = await Inquiry.findById(req.params.id);
+    if (!inquiry) {
+      return res.status(404).json({ success: false, message: 'Inquiry not found' });
+    }
+
+    inquiry.status = status;
+    inquiry.adminRespondedAt = new Date();
+
+    if (typeof adminNotes === 'string' && adminNotes.trim()) {
+      inquiry.adminNotes = adminNotes.trim();
+    }
+
+    if (status === 'Shipped') {
+      inquiry.pipelineStage = 'Shipment';
+      inquiry.pipelineHistory = inquiry.pipelineHistory || [];
+      inquiry.pipelineHistory.push({
+        stage: 'Shipment',
+        notes: inquiry.adminNotes || 'Marked as shipped by admin',
+        updatedAt: new Date()
+      });
+    }
+
+    await inquiry.save();
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.emit('inquiry-status-updated', {
+        inquiryId: inquiry._id,
+        status: inquiry.status,
+        pipelineStage: inquiry.pipelineStage
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Inquiry status updated successfully',
+      inquiry
+    });
+  } catch (error) {
+    console.error('Error updating inquiry status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating inquiry status',
+      error: error.message
+    });
+  }
+};
+
+exports.acceptInquiry = async (req, res) => {
+  try {
+    const inquiry = await Inquiry.findById(req.params.id).populate('productId', 'name category fabricType sizeRange');
+    if (!inquiry) {
+      return res.status(404).json({ success: false, message: 'Inquiry not found' });
+    }
+
+    if (inquiry.status === 'Accepted' || inquiry.status === 'Approved' || inquiry.status === 'Confirmed') {
+      return res.status(400).json({ success: false, message: 'Inquiry is already accepted or confirmed' });
+    }
+
+    // Update inquiry status and pipeline
+    inquiry.status = 'Accepted';
+    inquiry.pipelineStage = 'Admin Accepted';
+    inquiry.pipelineHistory = inquiry.pipelineHistory || [];
+    inquiry.pipelineHistory.push({
+      stage: 'Admin Accepted',
+      notes: req.body?.adminNotes || 'Accepted by admin',
+      updatedAt: new Date()
+    });
+    if (req.body?.adminNotes) {
+      inquiry.adminNotes = req.body.adminNotes;
+    }
+    inquiry.adminRespondedAt = new Date();
+    await inquiry.save();
+
+    // Load buyer info for richer email (falls back to fields stored on inquiry)
+    const buyer = await Buyer.findById(inquiry.buyerId);
+    const buyerName = buyer?.contactPerson || inquiry.contactPerson || inquiry.companyName || 'Buyer';
+    const buyerEmail = buyer?.email || inquiry.email;
+    const deliveryCountry = buyer?.country;
+
+    if (!buyerEmail) {
+      return res.json({
+        success: true,
+        message: 'Inquiry accepted, but buyer email not found to send notification',
+        inquiry
+      });
+    }
+
+    try {
+      await sendInquiryAcceptedEmail({
+        userEmail: buyerEmail,
+        userName: buyerName,
+        productName: inquiry.productId?.name,
+        fabric: inquiry.fabricType || inquiry.productId?.fabricType,
+        size: inquiry.productId?.sizeRange,
+        color: undefined,
+        quantity: inquiry.quantity,
+        buyerMessage: buyer?.requirements,
+        deliveryCountry
+      });
+    } catch (mailError) {
+      console.error('[EMAIL] Failed to send inquiry accepted email:', mailError.message);
+    }
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.emit('inquiry-status-updated', {
+        inquiryId: inquiry._id,
+        status: inquiry.status,
+        pipelineStage: inquiry.pipelineStage
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Inquiry accepted and buyer notified successfully',
+      inquiry
+    });
+  } catch (error) {
+    console.error('Error accepting inquiry:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error accepting inquiry',
       error: error.message
     });
   }
@@ -708,6 +863,7 @@ exports.confirmInquiry = async (req, res) => {
     if (req.body.adminNotes) {
       inquiry.adminNotes = req.body.adminNotes;
     }
+    inquiry.adminRespondedAt = new Date();
     await inquiry.save();
 
     const io = req.app.get('socketio');
@@ -784,6 +940,13 @@ exports.updateSampleStatus = async (req, res) => {
         success: false,
         message: 'Sample request not found'
       });
+    }
+
+    // Send status update email
+    try {
+      await sendStatusUpdate(sampleRequest.buyerEmail, sampleRequest.buyerName, 'Sample Request', status, sampleRequest._id);
+    } catch (mailError) {
+      console.error('[EMAIL] Failed to send sample status update email:', mailError.message);
     }
 
     res.json({

@@ -42,14 +42,16 @@ const inquirySchema = new mongoose.Schema({
         trim: true
     },
     designUploads: [{
-        type: String, // URLs to uploaded design files (Tech Packs)
+        type: String,
         trim: true
     }],
+    inquiryMessage: {
+        type: String,
+        trim: true
+    },
     provisionalLeadTime: {
-        type: Number, // in days
+        type: Number,
         default: function () {
-            // Basic logic to calculate lead time based on quantity
-            // e.g., Base 14 days + 1 day per 500 units
             const qty = this.quantity || 1;
             const baseDays = 14;
             const additionalDays = Math.ceil(qty / 500);
@@ -58,12 +60,42 @@ const inquirySchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected', 'Confirmed', 'Converted to Order'],
+        enum: ['Pending', 'Accepted', 'Approved', 'Rejected', 'Confirmed', 'Converted to Order', 'Shipped'],
         default: 'Pending'
     },
+    pipelineStage: {
+        type: String,
+        enum: [
+            'Inquiry Received',
+            'Admin Accepted',
+            'Quotation Sent',
+            'Sample Approved',
+            'Order Confirmed',
+            'Production',
+            'Shipment'
+        ],
+        default: 'Inquiry Received'
+    },
+    pipelineHistory: [{
+        stage: {
+            type: String,
+            required: true
+        },
+        notes: {
+            type: String,
+            trim: true
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     adminNotes: {
         type: String,
         trim: true
+    },
+    adminRespondedAt: {
+        type: Date
     },
     createdAt: {
         type: Date,
@@ -78,7 +110,6 @@ const inquirySchema = new mongoose.Schema({
 // Update the updatedAt field before saving
 inquirySchema.pre('save', function (next) {
     this.updatedAt = Date.now();
-    // Recalculate lead time if quantity changes
     if (this.isModified('quantity')) {
         const baseDays = 14;
         const additionalDays = Math.ceil(this.quantity / 500);

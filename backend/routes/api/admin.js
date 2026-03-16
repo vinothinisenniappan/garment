@@ -63,6 +63,8 @@ router.put('/buyers/:id/status', isAuthenticated, adminController.updateBuyerSta
 // Product Inquiries
 router.get('/inquiries', isAuthenticated, adminController.getInquiries);
 router.put('/inquiries/:id/confirm', isAuthenticated, adminController.confirmInquiry);
+router.put('/inquiries/:id/accept', isAuthenticated, adminController.acceptInquiry);
+router.put('/inquiries/:id/status', isAuthenticated, adminController.updateInquiryStatus);
 
 // Sample requests
 router.get('/samples', isAuthenticated, adminController.getSamples);

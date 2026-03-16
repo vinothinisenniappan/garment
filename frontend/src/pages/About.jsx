@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Target, Eye, ShieldCheck, Handshake, Package, Phone, Mail, MapPin } from 'lucide-react';
+import { Building2, Target, Eye, ShieldCheck, Handshake, Package, Phone, Mail, MapPin, Globe, Award } from 'lucide-react';
 
 export default function About() {
   const legacyPoints = [
@@ -67,6 +67,73 @@ export default function About() {
               shipment, we work with transparency, precision, and speed to deliver garments that meet international expectations
               in quality, consistency, and timeline reliability.
             </p>
+          </div>
+        </section>
+
+        {/* Export Projects Banner */}
+        <section className="reveal-on-scroll" style={{ marginTop: '30px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #0f2e5a 0%, #1a4a8f 60%, #1565c0 100%)',
+            borderRadius: '28px',
+            padding: '32px 36px',
+            color: '#fff',
+            boxShadow: '0 20px 50px rgba(15, 46, 90, 0.25)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+            <div style={{ position: 'absolute', bottom: '-60px', right: '80px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', position: 'relative', zIndex: 1 }}>
+              <div style={{ maxWidth: '580px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <Globe size={20} style={{ color: '#90caf9' }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#fff' }}>International Export Projects</span>
+                </div>
+                <h2 style={{ fontSize: '1.7rem', fontWeight: 900, marginBottom: '10px', fontFamily: 'Outfit, sans-serif', lineHeight: 1.15 }}>
+                  Made in India — Shipped to the World
+                </h2>
+                <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.94)', lineHeight: 1.7, marginBottom: '20px' }}>
+                  We manufacture and export garments to leading international brands. Our products are currently retailing across Europe under the <strong style={{ color: '#fff' }}>Navigare</strong> brand (est. 1961, Italy) — produced in our certified Tamil Nadu facility under ISO 9002 quality standards and Sedex ethical compliance.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {[
+                    { label: 'Navigare — Italy', icon: '🇮🇹' },
+                    { label: 'Lonsdale — UK', icon: '🇬🇧' },
+                    { label: 'Disney — USA', icon: '🇺🇸' }
+                  ].map(({ label, icon }) => (
+                    <span key={label} style={{
+                      background: 'rgba(255,255,255,0.12)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '50px',
+                      padding: '8px 18px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      backdropFilter: 'blur(8px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px'
+                    }}>{icon} {label}</span>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: '200px' }}>
+                {[
+                  { Icon: Package, label: 'Combed Cotton Pyjamas', sub: 'Navigare — boxed premium sets' },
+                  { Icon: Award, label: 'ISO 9002 Certified', sub: 'Sedex audited factory' },
+                  { Icon: Globe, label: 'Exported to Italy', sub: 'Now retailing in Europe' }
+                ].map(({ Icon, label, sub }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                      <Icon size={18} style={{ color: '#90caf9' }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 700 }}>{label}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.88)' }}>{sub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 

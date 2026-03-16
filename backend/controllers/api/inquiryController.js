@@ -5,7 +5,7 @@
 
 const Buyer = require('../../models/Buyer');
 const { validationResult } = require('express-validator');
-const { sendInquiryNotificationEmail } = require('../../utils/mailer');
+const { sendInquiryConfirmation, sendAdminNotification } = require('../../utils/mailer');
 const crypto = require('crypto');
 
 // Submit inquiry form
@@ -21,65 +21,100 @@ exports.submitInquiry = async (req, res) => {
       });
     }
 
-    const buyerData = {
-      companyName: req.body.companyName,
-      contactPerson: req.body.contactPerson,
-      email: req.body.email,
-      phone: req.body.phone,
-      country: req.body.country,
-      address: req.body.address,
-      website: req.body.website,
-      businessType: req.body.businessType,
-      requirements: req.body.requirements,
-      annualVolume: req.body.annualVolume,
-      preferredCategories: Array.isArray(req.body.preferredCategories)
-        ? req.body.preferredCategories
-        : req.body.preferredCategories ? [req.body.preferredCategories] : [],
-      // Inquiry submissions don't have a password; generate a secure temporary one
-      password: crypto.randomBytes(16).toString('hex')
-    };
+    const preferredCategories = Array.isArray(req.body.preferredCategories)
+      ? req.body.preferredCategories
+      : req.body.preferredCategories ? [req.body.preferredCategories] : [];
 
-    const buyer = new Buyer(buyerData);
+    let buyer = null;
+
+    if (req.session?.userId) {
+      buyer = await Buyer.findById(req.session.userId);
+      if (!buyer) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authenticated buyer not found'
+        });
+      }
+    } else {
+      const email = (req.body.email || '').toLowerCase();
+      buyer = await Buyer.findOne({ email });
+      if (!buyer) {
+        buyer = new Buyer({
+          companyName: req.body.companyName,
+          contactPerson: req.body.contactPerson,
+          email,
+          phone: req.body.phone,
+          country: req.body.country,
+          address: req.body.address,
+          website: req.body.website,
+          businessType: req.body.businessType,
+          requirements: req.body.requirements,
+          annualVolume: req.body.annualVolume,
+          preferredCategories,
+          // Inquiry submissions don't have a password; generate a secure temporary one
+          password: crypto.randomBytes(16).toString('hex')
+        });
+      }
+    }
+
+    // Keep buyer profile aligned with latest submitted details.
+    buyer.companyName = req.body.companyName || buyer.companyName;
+    buyer.contactPerson = req.body.contactPerson || buyer.contactPerson;
+    buyer.email = (req.body.email || buyer.email || '').toLowerCase();
+    buyer.phone = req.body.phone || buyer.phone;
+    buyer.country = req.body.country || buyer.country;
+    buyer.address = req.body.address || buyer.address;
+    buyer.website = req.body.website || buyer.website;
+    buyer.businessType = req.body.businessType || buyer.businessType;
+    buyer.requirements = req.body.requirements || buyer.requirements;
+    buyer.annualVolume = req.body.annualVolume || buyer.annualVolume;
+    buyer.preferredCategories = preferredCategories.length ? preferredCategories : buyer.preferredCategories;
     await buyer.save();
 
-    let savedInquiry = null;
+    const Inquiry = require('../../models/Inquiry');
+    const quantity = parseInt(req.body.quantity, 10) || parseInt(req.body.annualVolume, 10) || 1000;
+
+    const inquiryData = {
+      buyerId: buyer._id,
+      quantity,
+      fabricType: req.body.fabricType || 'Standard Fabric',
+      inquiryMessage: req.body.requirements,
+      companyName: buyer.companyName,
+      contactPerson: buyer.contactPerson,
+      email: buyer.email,
+      phone: buyer.phone,
+      status: 'Pending'
+    };
+
     if (req.body.productId) {
-      const Inquiry = require('../../models/Inquiry');
-      const quantity = parseInt(req.body.quantity, 10) || parseInt(req.body.annualVolume, 10) || 1000;
-      
-      const inquiryData = {
-        buyerId: buyer._id,
-        productId: req.body.productId,
-        quantity: quantity,
-        fabricType: req.body.fabricType || 'Standard Fabric',
-        companyName: buyer.companyName,
-        contactPerson: buyer.contactPerson,
-        email: buyer.email,
-        phone: buyer.phone,
-        status: 'Pending'
-      };
-      
-      savedInquiry = new Inquiry(inquiryData);
-      await savedInquiry.save();
+      inquiryData.productId = req.body.productId;
     }
+
+    const savedInquiry = new Inquiry(inquiryData);
+    await savedInquiry.save();
 
     // Emit real-time update
     const io = req.app.get('socketio');
     if (io) {
       io.emit('new-inquiry', {
-        id: buyer._id,
-        message: `${buyer.contactPerson} of the buyer placed an order.`,
+        id: savedInquiry?._id || buyer._id,
+        message: `${buyer.contactPerson} submitted a new inquiry.`,
         buyerName: buyer.contactPerson,
         companyName: buyer.companyName,
         contactPerson: buyer.contactPerson,
         email: buyer.email,
+        inquiryId: savedInquiry?._id,
         submittedAt: buyer.submittedAt
       });
     }
 
     let emailNotification = { success: false, skipped: true };
     try {
-      const mailResult = await sendInquiryNotificationEmail({
+      // Send confirmation to buyer
+      await sendInquiryConfirmation(buyer.email, buyer.contactPerson);
+      
+      // Send notification to admin
+      const mailResult = await sendAdminNotification('Inquiry', {
         buyerName: buyer.contactPerson,
         companyName: buyer.companyName,
         buyerEmail: buyer.email,
@@ -96,7 +131,7 @@ exports.submitInquiry = async (req, res) => {
       };
 
       if (!mailResult.skipped) {
-        console.log(`Inquiry email sent. Message ID: ${mailResult.messageId}`);
+        console.log(`Inquiry email notification sent. Message ID: ${mailResult.messageId}`);
       }
     } catch (mailError) {
       emailNotification = {

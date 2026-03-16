@@ -1,17 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
 import { 
   LayoutDashboard, 
   ShoppingBag, 
-  ShoppingCart, 
   Users, 
   Boxes, 
   Tags, 
   BarChart3, 
-  Image as ImageIcon, 
   LogOut,
   Bell,
-  Search,
   RefreshCcw,
   Zap,
   ClipboardList
@@ -21,14 +18,12 @@ import { apiBaseUrl, apiFetch } from '../lib/api'
 // Import Modular Sections
 import DashboardHome from '../components/admin/DashboardHome'
 import ProductManager from '../components/admin/ProductManager'
-import OrderManager from '../components/admin/OrderManager'
 import CustomerList from '../components/admin/CustomerList'
 import InventoryMatrix from '../components/admin/InventoryMatrix'
 import CategoryManager from '../components/admin/CategoryManager'
 import SalesAnalytics from '../components/admin/SalesAnalytics'
 import ProductForm from '../components/admin/ProductForm'
 import SampleInquiryManager from '../components/admin/SampleInquiryManager'
-import BuyerInquiryManager from '../components/admin/BuyerInquiryManager'
 import InquiryManager from '../components/admin/InquiryManager'
 
 export default function AdminDashboard() {
@@ -49,25 +44,26 @@ export default function AdminDashboard() {
   
   const [data, setData] = useState({
     products: [],
-    orders: [],
-    buyers: [],
     categories: [],
     recentOrders: []
   })
 
   const [liveNotification, setLiveNotification] = useState('')
+  const [notifications, setNotifications] = useState([])
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showProductForm, setShowProductForm] = useState(false)
   const [currentProduct, setCurrentProduct] = useState(null)
+  const notificationRef = useRef(null)
+
+  const unreadCount = notifications.filter((item) => !item.read).length
 
   const sidebarItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
     { name: 'Products', icon: ShoppingBag },
-    { name: 'Orders', icon: ShoppingCart },
-    { name: 'Buyer Database', icon: Users },
-    { name: 'Inquiries', icon: Users },
+    { name: 'Buyer Inquiry', icon: Users },
     { name: 'Sample Inquiries', icon: ClipboardList },
     { name: 'Inventory', icon: Boxes },
     { name: 'Categories', icon: Tags },
@@ -85,17 +81,13 @@ export default function AdminDashboard() {
 
       // Fetch specific module data based on active section or all at once?
       // For a "Pro" feel, we'll fetch what's needed
-      const [pRes, oRes, bRes, cRes] = await Promise.all([
+      const [pRes, cRes] = await Promise.all([
         apiFetch('/api/admin/products'),
-        apiFetch('/api/admin/orders'),
-        apiFetch('/api/admin/buyers'),
         apiFetch('/api/admin/categories')
       ])
 
       setData({
         products: pRes.products || [],
-        orders: oRes.orders || [],
-        buyers: bRes.buyers || [],
         categories: cRes.categories || [],
         recentOrders: res.recentOrders || []
       })
@@ -137,14 +129,135 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleUpdateInventory = async (productId, inventory) => {
+    const targetProduct = data.products.find((p) => p._id === productId)
+    if (!targetProduct) {
+      alert('Product not found')
+      return false
+    }
+
+    const safeInventory = {
+      S: Number(inventory.S) || 0,
+      M: Number(inventory.M) || 0,
+      L: Number(inventory.L) || 0,
+      XL: Number(inventory.XL) || 0,
+      XXL: Number(inventory.XXL) || 0
+    }
+
+    const payload = {
+      name: targetProduct.name,
+      category: targetProduct.category,
+      description: targetProduct.description || '',
+      fabricType: targetProduct.fabricType,
+      gsm: targetProduct.gsm,
+      sizeRange: targetProduct.sizeRange,
+      price: Number(targetProduct.price) || 0,
+      inventory: safeInventory,
+      colors: Array.isArray(targetProduct.colors) ? targetProduct.colors : [],
+      images: Array.isArray(targetProduct.images) ? targetProduct.images : [],
+      isFeatured: Boolean(targetProduct.isFeatured),
+      isActive: targetProduct.isActive !== false
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!res.success) {
+        throw new Error(res.message || 'Failed to update inventory')
+      }
+
+      await fetchAllData()
+      return true
+    } catch (e) {
+      alert(`Error updating inventory: ${e.message}`)
+      return false
+    }
+  }
+
+  const addNotification = (message, type = 'update') => {
+    const item = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      type,
+      message,
+      timestamp: new Date().toISOString(),
+      read: false
+    }
+
+    setNotifications((prev) => [item, ...prev].slice(0, 30))
+    setLiveNotification(message)
+  }
+
+  const formatNotificationMessage = (event, payload) => {
+    if (event === 'new-inquiry') {
+      return payload?.message || `${payload?.contactPerson || 'A buyer'} submitted a new inquiry.`
+    }
+    if (event === 'buyer-status-updated') {
+      return `Buyer status updated to ${payload?.status || 'Unknown'}.`
+    }
+    if (event === 'orders-updated') {
+      return `A new order was generated from a qualified buyer inquiry.`
+    }
+    if (event === 'inquiry-status-updated') {
+      return `Inquiry status changed to ${payload?.status || 'Updated'}.`
+    }
+    if (event === 'products-updated') {
+      return `Product inventory was updated.`
+    }
+    return payload?.message || 'New admin update received.'
+  }
+
+  const markNotificationsAsRead = () => {
+    setNotifications((prev) => prev.map((item) => ({ ...item, read: true })))
+  }
+
   useEffect(() => {
     fetchAllData()
     const socket = io(apiBaseUrl || window.location.origin, { withCredentials: true })
-    socket.on('new-inquiry', (msg) => {
-      setLiveNotification(msg?.message || 'New inquiry received!')
-      fetchAllData()
+
+    const eventNames = [
+      'new-inquiry',
+      'buyer-status-updated',
+      'orders-updated',
+      'inquiry-status-updated',
+      'products-updated'
+    ]
+
+    eventNames.forEach((eventName) => {
+      socket.on(eventName, (payload) => {
+        addNotification(formatNotificationMessage(eventName, payload), eventName)
+      })
     })
+
+    const refreshEvents = [
+      'new-inquiry',
+      'orders-updated',
+      'buyer-status-updated',
+      'inquiry-status-updated',
+      'products-updated'
+    ]
+
+    refreshEvents.forEach((eventName) => {
+      socket.on(eventName, () => {
+        fetchAllData()
+      })
+    })
+
     return () => socket.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setIsNotificationOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const renderContent = () => {
@@ -158,11 +271,9 @@ export default function AdminDashboard() {
           onDelete={handleDeleteProduct}
         />
       );
-      case 'Orders': return <OrderManager orders={data.orders} onUpdateStatus={(id, status) => alert(`Update Order ${id}`)} />;
-      case 'Buyer Database': return <BuyerInquiryManager buyers={data.buyers} onRefresh={fetchAllData} />;
-      case 'Inquiries': return <InquiryManager onRefresh={fetchAllData} />;
+      case 'Buyer Inquiry': return <InquiryManager onRefresh={fetchAllData} />;
       case 'Sample Inquiries': return <SampleInquiryManager />;
-      case 'Inventory': return <InventoryMatrix products={data.products} />;
+      case 'Inventory': return <InventoryMatrix products={data.products} onUpdateInventory={handleUpdateInventory} />;
       case 'Categories': return <CategoryManager categories={data.categories} onAdd={(cat) => alert('Add Category')} />;
       case 'Analytics': return <SalesAnalytics stats={stats} />;
       default: return <div className="pro-card center cap-desc">Coming Soon: {activeSection}</div>;
@@ -238,12 +349,49 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
-              <Bell size={22} color="#64748b" />
-              {stats.newInquiries > 0 && (
-                <span style={{ position: 'absolute', top: '-5px', right: '-5px', width: '18px', height: '18px', background: '#ef4444', color: 'white', borderRadius: '50%', fontSize: '10px', fontWeight: 900, display: 'grid', placeItems: 'center', border: '2px solid white' }}>
-                  {stats.newInquiries}
-                </span>
+            <div ref={notificationRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => {
+                  const nextOpen = !isNotificationOpen
+                  setIsNotificationOpen(nextOpen)
+                  if (nextOpen) markNotificationsAsRead()
+                }}
+                style={{ border: 'none', background: 'transparent', cursor: 'pointer', position: 'relative', padding: 0, display: 'grid', placeItems: 'center' }}
+                aria-label="Toggle notifications"
+              >
+                <Bell size={22} color="#64748b" />
+                {unreadCount > 0 && (
+                  <span style={{ position: 'absolute', top: '-5px', right: '-8px', minWidth: '18px', height: '18px', padding: '0 5px', background: '#ef4444', color: 'white', borderRadius: '999px', fontSize: '10px', fontWeight: 900, display: 'grid', placeItems: 'center', border: '2px solid white' }}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationOpen && (
+                <div style={{ position: 'absolute', top: '34px', right: '-10px', width: '380px', maxHeight: '420px', overflowY: 'auto', background: 'white', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 18px 45px rgba(15, 23, 42, 0.16)', zIndex: 20 }}>
+                  <div style={{ padding: '14px 16px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong style={{ fontSize: '14px', color: '#0f172a' }}>Notifications</strong>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>{notifications.length} total</span>
+                  </div>
+
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: '22px 16px', color: '#64748b', fontSize: '13px' }}>
+                      No messages yet. Real-time updates will appear here.
+                    </div>
+                  ) : (
+                    notifications.map((item) => (
+                      <div
+                        key={item.id}
+                        style={{ padding: '12px 16px', borderBottom: '1px solid #f1f5f9', background: item.read ? 'white' : '#f8fafc' }}
+                      >
+                        <div style={{ fontSize: '13px', color: '#0f172a', lineHeight: 1.4 }}>{item.message}</div>
+                        <div style={{ marginTop: '4px', fontSize: '11px', color: '#64748b' }}>
+                          {new Date(item.timestamp).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
             </div>
             <button 
@@ -278,14 +426,6 @@ export default function AdminDashboard() {
               <p className="cap-desc" style={{ marginTop: '5px' }}>
                 Last synced: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Never'}
               </p>
-            </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button className="pro-button--compact" style={{ height: '48px', padding: '0 25px', background: 'white', border: '1px solid #e2e8f0', color: 'var(--primary)' }}>
-                View Logs
-              </button>
-              <button className="pro-button" style={{ height: '48px', padding: '0 25px' }}>
-                Quick Action
-              </button>
             </div>
           </div>
 

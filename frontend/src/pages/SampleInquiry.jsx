@@ -233,8 +233,8 @@ export default function SampleInquiry() {
                 <input type="number" min="1" className="pro-input" value={formData.product.quantity} onChange={(e) => handleNestedChange('product', 'quantity', parseInt(e.target.value))} />
               </div>
               <div className="pro-field">
-                <label>Est. Target Price / Pc ($)</label>
-                <input type="number" step="0.01" className="pro-input" placeholder="e.g. 15.50" value={formData.product.targetPrice} onChange={(e) => handleNestedChange('product', 'targetPrice', parseFloat(e.target.value))} />
+                <label>Est. Target Price / Pc (INR)</label>
+                <input type="number" step="0.01" className="pro-input" placeholder="e.g. 450.00" value={formData.product.targetPrice} onChange={(e) => handleNestedChange('product', 'targetPrice', parseFloat(e.target.value))} />
               </div>
             </div>
           </div>
@@ -408,7 +408,7 @@ export default function SampleInquiry() {
                 <input type="date" className="pro-input" value={formData.sampling.deadline} onChange={(e) => handleNestedChange('sampling', 'deadline', e.target.value)} />
               </div>
               <div className="pro-field">
-                <label>Sample Budget ($)</label>
+                <label>Sample Budget (INR)</label>
                 <input type="number" className="pro-input" value={formData.sampling.budget} onChange={(e) => handleNestedChange('sampling', 'budget', parseFloat(e.target.value))} />
               </div>
             </div>
@@ -429,7 +429,7 @@ export default function SampleInquiry() {
                 </select>
               </div>
               <div className="pro-field">
-                <label>Target Production Price ($)</label>
+                <label>Target Production Price (INR)</label>
                 <input type="number" step="0.01" className="pro-input" value={formData.bulkOrder.targetPrice} onChange={(e) => handleNestedChange('bulkOrder', 'targetPrice', parseFloat(e.target.value))} />
               </div>
             </div>

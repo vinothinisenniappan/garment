@@ -420,21 +420,43 @@ select {
 	color: var(--text);
 }
 
-.pro-input {
+.pro-input,
+.form-input {
 	padding: 14px 16px;
-	border: 1px solid var(--border);
-	border-radius: 8px;
+	border: 1px solid #cbd5e1;
+	border-radius: 12px;
 	font-size: 16px;
 	transition: var(--transition);
 	width: 100%;
 	appearance: none;
-	/* Better mobile look */
+	background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(15, 23, 42, 0.04);
+	color: #0f172a;
 }
 
-.pro-input:focus {
+.pro-input:hover,
+.form-input:hover {
+	border-color: #94a3b8;
+}
+
+.pro-input::placeholder,
+.form-input::placeholder {
+	color: #94a3b8;
+}
+
+.pro-input:focus,
+.form-input:focus {
 	outline: none;
-	border-color: var(--accent);
-	box-shadow: 0 0 0 4px rgba(3, 70, 148, 0.1);
+	border-color: #6366f1;
+	box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14), 0 8px 20px rgba(15, 23, 42, 0.08);
+	background: #ffffff;
+}
+
+.admin-pro-shell .pro-input,
+.admin-pro-shell .form-input {
+	height: 44px;
+	font-size: 14px;
+	border-radius: 10px;
 }
 
 .pro-button {
@@ -672,6 +694,11 @@ flex-wrap: wrap;
 }
 
 .cert-card:hover img {
+.inquiry-page .page-container {
+	margin: 16px auto 0;
+	padding-top: 8px;
+	min-height: auto;
+}
 	filter: grayscale(0%);
 	opacity: 1;
 	transform: scale(1.1);
@@ -2774,6 +2801,168 @@ flex-wrap: wrap;
 
 .about-contact-grid a:hover {
 	text-decoration: underline;
+}
+
+/* Buyer Profile Page */
+.buyer-profile-page .page-container {
+	max-width: 1180px;
+	margin: 16px auto 0;
+	padding-top: 8px;
+	min-height: auto;
+}
+
+.buyer-profile-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.buyer-profile-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	background: #f8fafc;
+	color: #334155;
+	font-weight: 600;
+}
+
+.buyer-inquiry-cards,
+.buyer-timeline {
+	display: grid;
+	gap: 14px;
+}
+
+.buyer-inquiry-card {
+	padding: 18px 20px;
+}
+
+.buyer-inquiry-top {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	align-items: flex-start;
+	margin-bottom: 10px;
+}
+
+.buyer-inquiry-product {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.buyer-inquiry-product h3 {
+	margin: 0;
+	font-size: 1rem;
+	color: #0f172a;
+}
+
+.buyer-inquiry-product p {
+	margin: 4px 0 0;
+	font-size: 12px;
+	color: #64748b;
+}
+
+.buyer-inquiry-thumb {
+	width: 56px;
+	height: 56px;
+	border-radius: 10px;
+	overflow: hidden;
+	background: #eff6ff;
+	display: grid;
+	place-items: center;
+	color: #2563eb;
+	border: 1px solid #dbeafe;
+	flex-shrink: 0;
+}
+
+.buyer-inquiry-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.buyer-inquiry-message {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: #334155;
+}
+
+.buyer-admin-reply {
+	margin-top: 12px;
+	padding: 12px;
+	border-radius: 10px;
+	background: #eef2ff;
+	border: 1px solid #c7d2fe;
+}
+
+.buyer-admin-reply strong {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #4338ca;
+}
+
+.buyer-admin-reply p {
+	margin: 6px 0;
+	color: #1e293b;
+	font-weight: 500;
+}
+
+.buyer-admin-reply span {
+	font-size: 12px;
+	color: #475569;
+}
+
+.buyer-timeline-item {
+	padding: 16px 18px;
+	border-left: 4px solid #3b82f6;
+}
+
+.buyer-timeline-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.buyer-timeline-title {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #0f172a;
+}
+
+.buyer-timeline-item p {
+	margin: 0;
+	color: #334155;
+	line-height: 1.6;
+}
+
+.buyer-timeline-meta {
+	margin-top: 10px;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+	font-size: 12px;
+	color: #64748b;
+}
+
+@media (max-width: 900px) {
+	.buyer-profile-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.buyer-inquiry-top,
+	.buyer-timeline-head {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 }
 
 @media (max-width: 900px) {

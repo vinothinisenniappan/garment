@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear'],
+    enum: ['T-shirts', 'Shirts', 'Pyjamas', 'Kidswear', 'Shorts'],
     trim: true
   },
   description: {
@@ -54,7 +54,18 @@ const productSchema = new mongoose.Schema({
     S: { type: Number, default: 0 },
     M: { type: Number, default: 0 },
     L: { type: Number, default: 0 },
-    XL: { type: Number, default: 0 }
+    XL: { type: Number, default: 0 },
+    XXL: { type: Number, default: 0 }
+  },
+  exportClient: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  exportDestination: {
+    type: String,
+    trim: true,
+    default: null
   },
   colors: [{
     type: String,
@@ -81,7 +92,7 @@ const productSchema = new mongoose.Schema({
 // Middleware to calculate total stock quantity from inventory map
 productSchema.pre('save', function (next) {
   if (this.isModified('inventory')) {
-    this.stockQuantity = (this.inventory.S || 0) + (this.inventory.M || 0) + (this.inventory.L || 0) + (this.inventory.XL || 0);
+    this.stockQuantity = (this.inventory.S || 0) + (this.inventory.M || 0) + (this.inventory.L || 0) + (this.inventory.XL || 0) + (this.inventory.XXL || 0);
   }
   this.updatedAt = Date.now();
   next();

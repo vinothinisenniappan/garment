@@ -58,7 +58,7 @@ const buyerSchema = new mongoose.Schema({
   }],
   status: {
     type: String,
-    enum: ['New', 'Contacted', 'Qualified', 'Rejected'],
+    enum: ['New', 'Contacted', 'Qualified', 'Sourcing', 'Cutting', 'Stitching', 'QC', 'Shipping', 'Completed', 'Rejected'],
     default: 'New'
   },
   notes: {

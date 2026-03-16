@@ -7,6 +7,7 @@ const SampleRequest = require('../models/SampleRequest');
 const Product = require('../models/Product');
 const Buyer = require('../models/Buyer');
 const { validationResult } = require('express-validator');
+const { sendSampleInquiryConfirmation, sendAdminNotification } = require('../utils/mailer');
 
 // Render sample request form
 exports.getSampleRequestForm = async (req, res) => {
@@ -95,6 +96,25 @@ exports.submitSampleRequest = async (req, res) => {
     
     const sampleRequest = new SampleRequest(sampleData);
     await sampleRequest.save();
+    
+    // Send Email Notification to Buyer and Admin
+    try {
+      await sendSampleInquiryConfirmation(
+        sampleRequest.buyerEmail, 
+        sampleRequest.buyerName, 
+        sampleRequest._id // Using _id as it doesn't have an auto-generated inquiryId like the other model
+      );
+      
+      await sendAdminNotification('Sample Request', {
+        buyerName: sampleRequest.buyerName,
+        productName: sampleRequest.productName,
+        quantity: sampleRequest.quantity
+      });
+
+      console.log(`[EMAIL] Sample Request emails sent for: ${sampleRequest._id}`);
+    } catch (mailError) {
+      console.error('[EMAIL] Failed to send sample request emails:', mailError.message);
+    }
     
     res.render('sample-request-success', {
       title: 'Sample Request Submitted',

@@ -6,14 +6,63 @@ const express = require('express');
 const router = express.Router();
 const SampleInquiry = require('../../models/SampleInquiry');
 
+const requireUserAuth = (req, res, next) => {
+  if (!req.session?.userId) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+  next();
+};
+
+// GET Sample Inquiries for current logged-in buyer
+router.get('/my', requireUserAuth, async (req, res) => {
+  try {
+    const Buyer = require('../../models/Buyer');
+    const buyer = await Buyer.findById(req.session.userId).select('email');
+
+    if (!buyer) {
+      return res.status(404).json({ success: false, message: 'Buyer not found' });
+    }
+
+    const inquiries = await SampleInquiry.find({ 'buyer.email': buyer.email.toLowerCase() })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: inquiries.length,
+      inquiries
+    });
+  } catch (error) {
+    console.error('Error fetching user sample inquiries:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // CREATE a new Sample Inquiry (Buyer)
 router.post('/', async (req, res) => {
   try {
     const newInquiry = new SampleInquiry(req.body);
     const savedInquiry = await newInquiry.save();
     
-    // TODO: Send Email Notification to Admin (dummy log for now)
-    console.log(`[EMAIL] New Sample Inquiry received: ${savedInquiry.inquiryId} from ${savedInquiry.buyer.fullName} (${savedInquiry.buyer.email})`);
+    // Send Email Notification to Buyer and Admin
+    try {
+      const { sendSampleInquiryConfirmation, sendAdminNotification } = require('../../utils/mailer');
+      
+      await sendSampleInquiryConfirmation(
+        savedInquiry.buyer.email, 
+        savedInquiry.buyer.fullName, 
+        savedInquiry.inquiryId
+      );
+      
+      await sendAdminNotification('Sample Request', {
+        buyerName: savedInquiry.buyer.fullName,
+        productName: savedInquiry.product.category,
+        quantity: savedInquiry.product.quantity
+      });
+
+      console.log(`[EMAIL] Sample Inquiry emails sent for: ${savedInquiry.inquiryId}`);
+    } catch (mailError) {
+      console.error('[EMAIL] Failed to send sample inquiry emails:', mailError.message);
+    }
 
     res.status(201).json({
       success: true,

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { io } from 'socket.io-client';
-import { apiBaseUrl } from '../lib/api';
+import { apiBaseUrl, apiFetch } from '../lib/api';
 import '../styles.css';
 
 export default function Inventory() {
     const { user } = useAuth();
     const [orders, setOrders] = useState([]);
+    const [buyerInquiries, setBuyerInquiries] = useState([]);
+    const [sampleInquiries, setSampleInquiries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -14,8 +16,7 @@ export default function Inventory() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('/api/orders/my-orders');
-                const data = await response.json();
+                const data = await apiFetch('/api/orders/my-orders');
                 if (data.success) {
                     setOrders(data.orders);
                 } else {
@@ -29,14 +30,51 @@ export default function Inventory() {
             }
         };
 
+        const fetchSampleInquiries = async () => {
+            try {
+                const data = await apiFetch('/api/sample-inquiries/my');
+                if (data.success) {
+                    setSampleInquiries(data.inquiries || []);
+                }
+            } catch (err) {
+                console.error('Failed to fetch sample inquiries', err);
+            }
+        };
+
+        const fetchBuyerInquiries = async () => {
+            try {
+                const data = await apiFetch('/api/user/inquiries');
+                if (data.success) {
+                    setBuyerInquiries(data.inquiries || []);
+                }
+            } catch (err) {
+                console.error('Failed to fetch buyer inquiries', err);
+            }
+        };
+
         if (user) {
-            fetchOrders();
+            Promise.all([fetchOrders(), fetchSampleInquiries(), fetchBuyerInquiries()]);
         }
 
         const socket = io(apiBaseUrl || window.location.origin, { withCredentials: true });
         socket.on('orders-updated', () => {
             if (user) {
                 fetchOrders();
+            }
+        });
+        socket.on('inquiry-updated', () => {
+            if (user) {
+                fetchSampleInquiries();
+            }
+        });
+        socket.on('inquiry-status-updated', () => {
+            if (user) {
+                fetchBuyerInquiries();
+            }
+        });
+        socket.on('new-inquiry', () => {
+            if (user) {
+                fetchBuyerInquiries();
             }
         });
 
@@ -55,6 +93,8 @@ export default function Inventory() {
     };
 
     const milestonesList = ['Sourcing', 'Cutting', 'Stitching', 'QC', 'Shipping'];
+    const formatINR = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+    const hasAnyInquiry = buyerInquiries.length > 0 || sampleInquiries.length > 0;
 
     if (loading) return <div className="loading-screen">Loading your inventory...</div>;
 
@@ -70,13 +110,99 @@ export default function Inventory() {
             <div className="container" style={{ marginTop: '2rem', marginBottom: '4rem' }}>
                 {error && <div className="alert alert-error">{error}</div>}
 
-                {orders.length === 0 ? (
+                {buyerInquiries.length > 0 && (
+                    <div className="glassmorphic" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+                        <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>My Buyer Inquiries</h3>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '760px' }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Inquiry ID</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Product</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Fabric</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Quantity</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Status</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {buyerInquiries.map((inquiry) => (
+                                        <tr key={inquiry._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                            <td style={{ padding: '10px 8px', fontWeight: 700 }}>
+                                                INQ-{inquiry._id.slice(-6).toUpperCase()}
+                                            </td>
+                                            <td style={{ padding: '10px 8px' }}>{inquiry.productId?.name || 'Custom Product Inquiry'}</td>
+                                            <td style={{ padding: '10px 8px' }}>{inquiry.fabricType || '-'}</td>
+                                            <td style={{ padding: '10px 8px' }}>{inquiry.quantity || 0}</td>
+                                            <td style={{ padding: '10px 8px' }}>
+                                                <span
+                                                    className="status-tag"
+                                                    style={{
+                                                        backgroundColor:
+                                                            inquiry.status === 'Shipped' ? '#3B82F622' :
+                                                            inquiry.status === 'Rejected' ? '#EF444422' :
+                                                            inquiry.status === 'Accepted' || inquiry.status === 'Approved' || inquiry.status === 'Confirmed' ? '#10B98122' :
+                                                            '#F59E0B22',
+                                                        color:
+                                                            inquiry.status === 'Shipped' ? '#3B82F6' :
+                                                            inquiry.status === 'Rejected' ? '#EF4444' :
+                                                            inquiry.status === 'Accepted' || inquiry.status === 'Approved' || inquiry.status === 'Confirmed' ? '#10B981' :
+                                                            '#F59E0B'
+                                                    }}
+                                                >
+                                                    {inquiry.status}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '10px 8px' }}>{new Date(inquiry.updatedAt || inquiry.createdAt).toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {sampleInquiries.length > 0 && (
+                    <div className="glassmorphic" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+                        <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>My Sample Inquiries</h3>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '680px' }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Inquiry ID</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Product</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Quantity</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Status</th>
+                                        <th style={{ textAlign: 'left', padding: '10px 8px' }}>Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sampleInquiries.map((inquiry) => (
+                                        <tr key={inquiry._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                            <td style={{ padding: '10px 8px', fontWeight: 700 }}>{inquiry.inquiryId}</td>
+                                            <td style={{ padding: '10px 8px' }}>{inquiry.product?.category || '-'}</td>
+                                            <td style={{ padding: '10px 8px' }}>{inquiry.product?.quantity || 0}</td>
+                                            <td style={{ padding: '10px 8px' }}>
+                                                <span className="status-tag" style={{ backgroundColor: '#3B82F622', color: '#3B82F6' }}>
+                                                    {inquiry.status}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '10px 8px' }}>{new Date(inquiry.updatedAt || inquiry.createdAt).toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {orders.length === 0 && !hasAnyInquiry ? (
                     <div className="empty-inventory glassmorphic" style={{ padding: '3rem', textAlign: 'center' }}>
                         <h3>No orders found</h3>
                         <p>You haven't placed any manufacturing orders yet.</p>
                         <a href="/products" className="btn btn-primary" style={{ marginTop: '1rem' }}>Browse Products</a>
                     </div>
-                ) : (
+                ) : orders.length > 0 ? (
                     <div className="inventory-grid">
                         <div className="inventory-list">
                             {orders.map(order => (
@@ -95,7 +221,7 @@ export default function Inventory() {
                                                 <span key={idx}>{item.name} ({item.quantity})</span>
                                             )).reduce((prev, curr) => [prev, ', ', curr])}
                                         </div>
-                                        <div className="order-total">${order.totalAmount.toLocaleString()}</div>
+                                        <div className="order-total">{formatINR(order.totalAmount)}</div>
                                     </div>
                                     <div className="card-bottom">
                                         <span className="status-tag" style={{ backgroundColor: getStatusColor(order.status) + '22', color: getStatusColor(order.status) }}>
@@ -140,7 +266,7 @@ export default function Inventory() {
                                                     <div key={idx} className="item-row">
                                                         <span>{item.name} - {item.size}</span>
                                                         <span>Qty: {item.quantity}</span>
-                                                        <span>${(item.priceAtPurchase * item.quantity).toLocaleString()}</span>
+                                                        <span>{formatINR(item.priceAtPurchase * item.quantity)}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -160,7 +286,7 @@ export default function Inventory() {
                                     <div className="detail-footer">
                                         <div className="total-box">
                                             <span>Total Amount</span>
-                                            <h3>${selectedOrder.totalAmount.toLocaleString()}</h3>
+                                            <h3>{formatINR(selectedOrder.totalAmount)}</h3>
                                         </div>
                                         <button className="btn btn-outline">Download Invoice</button>
                                     </div>
@@ -179,7 +305,7 @@ export default function Inventory() {
                             )}
                         </div>
                     </div>
-                )}
+                ) : null}
             </div>
 
             <style>{`

@@ -4,6 +4,7 @@
  */
 
 const Buyer = require('../../models/Buyer');
+const Inquiry = require('../../models/Inquiry');
 const { validationResult } = require('express-validator');
 
 // Register a new buyer
@@ -135,6 +136,46 @@ exports.getProfile = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error while fetching profile'
+        });
+    }
+};
+
+// Get product inquiries for current logged-in buyer
+exports.getMyInquiries = async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Not authenticated'
+            });
+        }
+
+        const buyer = await Buyer.findById(req.session.userId).select('email');
+        if (!buyer) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const inquiries = await Inquiry.find({
+            $or: [
+                { buyerId: req.session.userId },
+                { email: buyer.email }
+            ]
+        })
+            .populate('productId', 'name category images price')
+            .sort({ updatedAt: -1, createdAt: -1 });
+
+        res.json({
+            success: true,
+            inquiries
+        });
+    } catch (error) {
+        console.error('Error fetching buyer inquiries:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching inquiries'
         });
     }
 };
