@@ -59,57 +59,46 @@ export default function Products() {
 
   return (
     <main className="products-page app--internal">
-      <section
-        className="internal-hero"
-        style={{
-          padding: 'calc(var(--header-height) + 34px) 0 34px',
-          marginBottom: 0,
-          background: 'linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)'
-        }}
-      >
-        <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
+      <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto 88px', padding: 'calc(var(--header-height) + 24px) 24px 0' }}>
           <div
             className="pro-card scale-reveal"
             style={{
-              padding: '34px',
-              borderRadius: '30px',
-              background: 'linear-gradient(135deg, rgba(15, 46, 90, 0.98) 0%, rgba(21, 79, 149, 0.94) 62%, rgba(56, 189, 248, 0.88) 100%)',
-              color: '#fff',
+              padding: '32px',
+              borderRadius: '28px',
+              background:'#fff',
+              color: '#03045e',
               boxShadow: '0 26px 60px rgba(15, 46, 90, 0.18)',
-              border: '1px solid rgba(255,255,255,0.14)'
+              border: '1px solid rgba(255,255,255,0.14)',
+              marginBottom: '20px'
             }}
           >
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.8fr)', gap: '24px', alignItems: 'end' }}>
               <div style={{ textAlign: 'left' }}>
-                <span style={{ color: 'rgba(255,255,255,0.76)', fontSize: '0.78rem', letterSpacing: '0.22em', textTransform: 'uppercase', display: 'inline-block', marginBottom: '12px', fontWeight: 700 }}>
+                <span style={{ color: '#0f2e5a', fontSize: '0.78rem', letterSpacing: '0.22em', textTransform: 'uppercase', display: 'inline-block', marginBottom: '10px', fontWeight: 700, opacity: 0.6 }}>
                   Precision Catalogue
                 </span>
-                <h1 className="internal-hero__title" style={{ fontSize: 'clamp(2.3rem, 4vw, 4.1rem)', fontWeight: 900, marginBottom: '14px', color: '#fff', letterSpacing: '-0.04em', textTransform: 'none', lineHeight: 1.02 }}>
+                <h1 style={{ fontSize: 'clamp(2.3rem, 4vw, 4.1rem)', fontWeight: 900, marginBottom: '12px', color: '#0f2e5a', letterSpacing: '-0.04em', lineHeight: 1.02, fontFamily: 'Outfit, sans-serif' }}>
                   Production Catalog
                 </h1>
-                <p style={{ maxWidth: '720px', margin: 0, color: 'rgba(255,255,255,0.84)', fontSize: '1rem', lineHeight: '1.7' }}>
+                <p style={{ maxWidth: '720px', margin: 0, color: '#4a5568', fontSize: '1rem', lineHeight: '1.7' }}>
                   Factory-ready garments arranged as a buyer-first collection with cleaner filtering, faster scanning, and live inventory-backed updates from the admin panel.
                 </p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
-                <div style={{ padding: '18px', borderRadius: '20px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.72)', marginBottom: '8px' }}>Live Range</div>
-                  <div style={{ fontSize: '1.9rem', fontWeight: 900 }}>{activeProducts}</div>
-                  <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.85rem' }}>active styles</div>
+                <div style={{ padding: '18px', borderRadius: '20px', background: '#f0f6ff', border: '1px solid #d1e3ff' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#4a6a9d', marginBottom: '8px' }}>Live Range</div>
+                  <div style={{ fontSize: '1.9rem', fontWeight: 900, color: '#0f2e5a' }}>{activeProducts}</div>
+                  <div style={{ color: '#4a6a9d', fontSize: '0.85rem' }}>active styles</div>
                 </div>
-                <div style={{ padding: '18px', borderRadius: '20px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.72)', marginBottom: '8px' }}>Collections</div>
-                  <div style={{ fontSize: '1.9rem', fontWeight: 900 }}>{Math.max(categories.length - 1, 0)}</div>
-                  <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.85rem' }}>category groups</div>
+                <div style={{ padding: '18px', borderRadius: '20px', background: '#f0f6ff', border: '1px solid #d1e3ff' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#4a6a9d', marginBottom: '8px' }}>Collections</div>
+                  <div style={{ fontSize: '1.9rem', fontWeight: 900, color: '#0f2e5a' }}>{Math.max(categories.length - 1, 0)}</div>
+                  <div style={{ color: '#4a6a9d', fontSize: '0.85rem' }}>category groups</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto 88px', padding: '28px 24px 0' }}>
         <section className="reveal-on-scroll" style={{ marginBottom: '34px' }}>
           <div className="pro-card" style={{ 
             padding: '22px 24px', 

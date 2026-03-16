@@ -49,8 +49,8 @@ export default function ProductDetail() {
 
   return (
     <main className="product-detail-page app--internal">
-      <section className="internal-hero" style={{ padding: 'calc(var(--header-height) + 28px) 0 28px', marginBottom: 0, background: 'linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)' }}>
-        <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
+      <section className="internal-hero" style={{ padding: 'calc(var(--header-height) + 12px) 0 14px', marginBottom: 0, background: 'linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)' }}>
+        <div className="product-detail-shell" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
           <div className="pro-card" style={{ padding: '28px 32px', borderRadius: '28px', boxShadow: '0 24px 54px rgba(15, 46, 90, 0.1)', border: '1px solid rgba(15, 46, 90, 0.08)' }}>
             <button
               onClick={() => navigate('/products')}
@@ -99,7 +99,7 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      <div className="page-container" style={{ maxWidth: '1240px', margin: '0 auto 96px', padding: '28px 24px 0' }}>
+      <div className="product-detail-shell" style={{ maxWidth: '1240px', margin: '0 auto 80px', padding: '10px 24px 0' }}>
         <div className="grid product-detail-layout" style={{ gridTemplateColumns: 'minmax(0, 1.15fr) minmax(320px, 0.85fr)', gap: '32px', alignItems: 'start' }}>
           <div className="reveal-on-scroll">
             <div className="pro-card" style={{ padding: '14px', borderRadius: '28px', background: '#fff', marginBottom: '26px', boxShadow: '0 24px 60px rgba(15, 46, 90, 0.1)' }}>
@@ -217,7 +217,7 @@ export default function ProductDetail() {
                 </li>
               </ul>
 
-              <button onClick={() => navigate('/buyer-inquiry', { state: { productName: product.name } })} className="pro-button" style={{ width: '100%', background: 'white', color: 'var(--primary)', height: '56px', fontSize: '1rem' }}>
+              <button onClick={() => navigate('/buyer-inquiry', { state: { productId: product._id, productName: product.name, category: product.category, fabricType: product.fabricType } })} className="pro-button" style={{ width: '100%', background: 'white', color: 'var(--primary)', height: '56px', fontSize: '1rem' }}>
                 Request Quote <Send size={18} style={{ marginLeft: '10px' }} />
               </button>
             </div>
@@ -236,6 +236,11 @@ export default function ProductDetail() {
 
       <style>{`
         @media (max-width: 980px) {
+          .product-detail-shell {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+
           .product-detail-layout {
             grid-template-columns: 1fr !important;
           }

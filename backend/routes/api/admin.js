@@ -60,6 +60,10 @@ router.get('/buyers', isAuthenticated, adminController.getBuyers);
 router.get('/buyers/:id', isAuthenticated, adminController.getBuyer);
 router.put('/buyers/:id/status', isAuthenticated, adminController.updateBuyerStatus);
 
+// Product Inquiries
+router.get('/inquiries', isAuthenticated, adminController.getInquiries);
+router.put('/inquiries/:id/confirm', isAuthenticated, adminController.confirmInquiry);
+
 // Sample requests
 router.get('/samples', isAuthenticated, adminController.getSamples);
 router.put('/samples/:id/status', isAuthenticated, adminController.updateSampleStatus);

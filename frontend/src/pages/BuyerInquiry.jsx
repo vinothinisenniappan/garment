@@ -1,9 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { apiFetch } from '../lib/api'
 
 export default function BuyerInquiry() {
+  const location = useLocation()
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+
+  // Optional associated product
+  const [productId, setProductId] = useState('')
+  const [productName, setProductName] = useState('')
 
   // Minimal required fields to satisfy backend
   const [companyName, setCompanyName] = useState('')
@@ -32,6 +38,21 @@ export default function BuyerInquiry() {
   const [longTerm, setLongTerm] = useState('Yes')
   const [country, setCountry] = useState('India')
 
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.productId) setProductId(location.state.productId)
+      if (location.state.productName) setProductName(location.state.productName)
+      if (location.state.category) {
+        // Map product category to inquiry form category if possible
+        const c = location.state.category;
+        if (['T-shirts', 'Shirts', 'Kids Wear', 'Ladies Wear'].includes(c)) {
+          setCategory(c === 'T-shirts' ? 'T-Shirts' : c)
+        }
+      }
+      if (location.state.fabricType) setFabricType(location.state.fabricType)
+    }
+  }, [location])
+
   const mapCategoryToBackend = (c) => {
     const map = {
       'T-Shirts': 'T-shirts',
@@ -47,6 +68,9 @@ export default function BuyerInquiry() {
     setError('')
     // Construct payload for backend /api/inquiry
     const payload = {
+      productId: productId || undefined,
+      quantity,
+      fabricType,
       companyName,
       contactPerson,
       email,
@@ -55,7 +79,7 @@ export default function BuyerInquiry() {
       address: stateCity,
       website: '',
       businessType,
-      requirements: `${category} • ${fabricType} • ${gsm} • ${sizeRange} • ${colorPref} • ${designType} • Qty ${quantity} • ${orderType} • ${packaging} • Delivery ${deliveryLocation} ${expectedDate}`,
+      requirements: `${productName ? `Product: ${productName} • ` : ''}${category} • ${fabricType} • ${gsm} • ${sizeRange} • ${colorPref} • ${designType} • Qty ${quantity} • ${orderType} • ${packaging} • Delivery ${deliveryLocation} ${expectedDate}`,
       annualVolume: quantity,
       preferredCategories: mapCategoryToBackend(category) ? [mapCategoryToBackend(category)] : []
     }

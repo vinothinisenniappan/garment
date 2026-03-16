@@ -636,6 +636,108 @@ exports.updateBuyerStatus = async (req, res) => {
   }
 };
 
+// --- Inquiries Management (Specific to Product Inquiries) ---
+exports.getInquiries = async (req, res) => {
+  try {
+    const inquiries = await Inquiry.find()
+      .populate('productId', 'name category price sizeRange')
+      .sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      inquiries
+    });
+  } catch (error) {
+    console.error('Error loading inquiries:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error loading inquiries',
+      error: error.message
+    });
+  }
+};
+
+exports.confirmInquiry = async (req, res) => {
+  try {
+    const inquiry = await Inquiry.findById(req.params.id);
+    if (!inquiry) {
+      return res.status(404).json({ success: false, message: 'Inquiry not found' });
+    }
+
+    if (inquiry.status === 'Confirmed' || inquiry.status === 'Approved') {
+      return res.status(400).json({ success: false, message: 'Inquiry is already confirmed' });
+    }
+
+    if (!inquiry.productId) {
+      // General inquiry without specific product relation
+      inquiry.status = 'Approved';
+      await inquiry.save();
+      return res.json({ success: true, message: 'General inquiry confirmed successfully', inquiry });
+    }
+
+    const product = await Product.findById(inquiry.productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Associated product not found' });
+    }
+
+    // Check inventory
+    let remainingToDeduct = inquiry.quantity;
+    
+    // First check total stock
+    if (product.stockQuantity < remainingToDeduct) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Insufficient inventory. Requested: ${remainingToDeduct}, Available: ${product.stockQuantity}` 
+      });
+    }
+
+    // Deduct from detailed inventory iteratively or directly from stockQuantity if inventory map is not strict
+    const sizes = ['S', 'M', 'L', 'XL'];
+    for (const size of sizes) {
+      if (remainingToDeduct <= 0) break;
+      if (product.inventory && product.inventory[size] > 0) {
+        const deduct = Math.min(product.inventory[size], remainingToDeduct);
+        product.inventory[size] -= deduct;
+        remainingToDeduct -= deduct;
+      }
+    }
+    
+    // The pre-save hook on Product will recalculate stockQuantity automatically based on the inventory map
+    await product.save();
+
+    inquiry.status = 'Confirmed';
+    if (req.body.adminNotes) {
+      inquiry.adminNotes = req.body.adminNotes;
+    }
+    await inquiry.save();
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.emit('inquiry-status-updated', {
+        inquiryId: inquiry._id,
+        status: inquiry.status
+      });
+      io.emit('products-updated', {
+        action: 'inventory_deducted',
+        productId: product._id
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Inquiry confirmed and inventory updated successfully',
+      inquiry
+    });
+  } catch (error) {
+    console.error('Error confirming inquiry:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error confirming inquiry',
+      error: error.message
+    });
+  }
+};
+
+
 // Sample requests management
 exports.getSamples = async (req, res) => {
   try {

@@ -42,6 +42,27 @@ exports.submitInquiry = async (req, res) => {
     const buyer = new Buyer(buyerData);
     await buyer.save();
 
+    let savedInquiry = null;
+    if (req.body.productId) {
+      const Inquiry = require('../../models/Inquiry');
+      const quantity = parseInt(req.body.quantity, 10) || parseInt(req.body.annualVolume, 10) || 1000;
+      
+      const inquiryData = {
+        buyerId: buyer._id,
+        productId: req.body.productId,
+        quantity: quantity,
+        fabricType: req.body.fabricType || 'Standard Fabric',
+        companyName: buyer.companyName,
+        contactPerson: buyer.contactPerson,
+        email: buyer.email,
+        phone: buyer.phone,
+        status: 'Pending'
+      };
+      
+      savedInquiry = new Inquiry(inquiryData);
+      await savedInquiry.save();
+    }
+
     // Emit real-time update
     const io = req.app.get('socketio');
     if (io) {

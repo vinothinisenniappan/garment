@@ -21,6 +21,26 @@ const inquirySchema = new mongoose.Schema({
         required: [true, 'Quantity is required'],
         min: 1
     },
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+    },
+    companyName: {
+        type: String,
+        trim: true
+    },
+    contactPerson: {
+        type: String,
+        trim: true
+    },
+    email: {
+        type: String,
+        trim: true
+    },
+    phone: {
+        type: String,
+        trim: true
+    },
     designUploads: [{
         type: String, // URLs to uploaded design files (Tech Packs)
         trim: true
@@ -30,14 +50,15 @@ const inquirySchema = new mongoose.Schema({
         default: function () {
             // Basic logic to calculate lead time based on quantity
             // e.g., Base 14 days + 1 day per 500 units
+            const qty = this.quantity || 1;
             const baseDays = 14;
-            const additionalDays = Math.ceil(this.quantity / 500);
+            const additionalDays = Math.ceil(qty / 500);
             return baseDays + additionalDays;
         }
     },
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected', 'Converted to Order'],
+        enum: ['Pending', 'Approved', 'Rejected', 'Confirmed', 'Converted to Order'],
         default: 'Pending'
     },
     adminNotes: {

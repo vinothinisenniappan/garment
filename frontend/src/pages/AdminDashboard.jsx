@@ -7,12 +7,8 @@ import {
   Users, 
   Boxes, 
   Tags, 
-  Ticket, 
-  Star, 
   BarChart3, 
   Image as ImageIcon, 
-  Settings, 
-  FileText, 
   LogOut,
   Bell,
   Search,
@@ -29,13 +25,11 @@ import OrderManager from '../components/admin/OrderManager'
 import CustomerList from '../components/admin/CustomerList'
 import InventoryMatrix from '../components/admin/InventoryMatrix'
 import CategoryManager from '../components/admin/CategoryManager'
-import CouponManager from '../components/admin/CouponManager'
-import ReviewModerator from '../components/admin/ReviewModerator'
 import SalesAnalytics from '../components/admin/SalesAnalytics'
-import ReportDownloader from '../components/admin/ReportDownloader'
 import ProductForm from '../components/admin/ProductForm'
 import SampleInquiryManager from '../components/admin/SampleInquiryManager'
 import BuyerInquiryManager from '../components/admin/BuyerInquiryManager'
+import InquiryManager from '../components/admin/InquiryManager'
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('Dashboard')
@@ -58,8 +52,6 @@ export default function AdminDashboard() {
     orders: [],
     buyers: [],
     categories: [],
-    coupons: [],
-    reviews: [],
     recentOrders: []
   })
 
@@ -74,15 +66,12 @@ export default function AdminDashboard() {
     { name: 'Dashboard', icon: LayoutDashboard },
     { name: 'Products', icon: ShoppingBag },
     { name: 'Orders', icon: ShoppingCart },
-    { name: 'Buyer Inquiries', icon: Users },
+    { name: 'Buyer Database', icon: Users },
+    { name: 'Inquiries', icon: Users },
     { name: 'Sample Inquiries', icon: ClipboardList },
     { name: 'Inventory', icon: Boxes },
     { name: 'Categories', icon: Tags },
-    { name: 'Coupons', icon: Ticket },
-    { name: 'Reviews', icon: Star },
-    { name: 'Analytics', icon: BarChart3 },
-    { name: 'Reports', icon: FileText },
-    { name: 'Settings', icon: Settings }
+    { name: 'Analytics', icon: BarChart3 }
   ]
 
   const fetchAllData = async () => {
@@ -96,13 +85,11 @@ export default function AdminDashboard() {
 
       // Fetch specific module data based on active section or all at once?
       // For a "Pro" feel, we'll fetch what's needed
-      const [pRes, oRes, bRes, cRes, cpRes, rRes] = await Promise.all([
+      const [pRes, oRes, bRes, cRes] = await Promise.all([
         apiFetch('/api/admin/products'),
         apiFetch('/api/admin/orders'),
         apiFetch('/api/admin/buyers'),
-        apiFetch('/api/admin/categories'),
-        apiFetch('/api/admin/coupons').catch(() => ({ coupons: [] })),
-        apiFetch('/api/admin/reviews').catch(() => ({ reviews: [] }))
+        apiFetch('/api/admin/categories')
       ])
 
       setData({
@@ -110,8 +97,6 @@ export default function AdminDashboard() {
         orders: oRes.orders || [],
         buyers: bRes.buyers || [],
         categories: cRes.categories || [],
-        coupons: cpRes.coupons || [],
-        reviews: rRes.reviews || [],
         recentOrders: res.recentOrders || []
       })
 
@@ -174,14 +159,12 @@ export default function AdminDashboard() {
         />
       );
       case 'Orders': return <OrderManager orders={data.orders} onUpdateStatus={(id, status) => alert(`Update Order ${id}`)} />;
-      case 'Buyer Inquiries': return <BuyerInquiryManager buyers={data.buyers} onRefresh={fetchAllData} />;
+      case 'Buyer Database': return <BuyerInquiryManager buyers={data.buyers} onRefresh={fetchAllData} />;
+      case 'Inquiries': return <InquiryManager onRefresh={fetchAllData} />;
       case 'Sample Inquiries': return <SampleInquiryManager />;
       case 'Inventory': return <InventoryMatrix products={data.products} />;
       case 'Categories': return <CategoryManager categories={data.categories} onAdd={(cat) => alert('Add Category')} />;
-      case 'Coupons': return <CouponManager coupons={data.coupons} />;
-      case 'Reviews': return <ReviewModerator reviews={data.reviews} onUpdateStatus={() => alert('Approve Review')} />;
       case 'Analytics': return <SalesAnalytics stats={stats} />;
-      case 'Reports': return <ReportDownloader />;
       default: return <div className="pro-card center cap-desc">Coming Soon: {activeSection}</div>;
     }
   }
@@ -195,8 +178,8 @@ export default function AdminDashboard() {
             <div style={{ width: '36px', height: '36px', background: 'var(--accent)', borderRadius: '10px', display: 'grid', placeItems: 'center' }}>
               <Zap size={20} fill="white" color="white" />
             </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px' }}>
-              GARMENT<span style={{ color: 'var(--accent)' }}>PRO</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>
+              Sree Anjaneye Exports
             </span>
           </div>
           <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1.5px', marginTop: '10px', fontWeight: 700 }}>Admin Cloud v2.5</div>
@@ -232,7 +215,7 @@ export default function AdminDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: 'white', marginBottom: '20px' }}>
             <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '12px', display: 'grid', placeItems: 'center', fontWeight: 800 }}>SA</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '14px' }}>System Admin</div>
+              <div style={{ fontWeight: 700, fontSize: '14px' }}>Selva</div>
               <div style={{ fontSize: '11px', color: '#64748b' }}>Master Account</div>
             </div>
           </div>
