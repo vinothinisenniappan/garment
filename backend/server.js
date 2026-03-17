@@ -15,10 +15,16 @@ const isProduction = process.env.NODE_ENV === 'production';
 const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
 
 // Allow multiple frontend origins in production: comma-separated in CLIENT_URL
+// Trailing slashes are stripped so https://example.com/ and https://example.com both work
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
+
+// Also allow the backend's own URL (Render health checks use it as origin)
+if (process.env.RENDER_EXTERNAL_URL) {
+  allowedOrigins.push(process.env.RENDER_EXTERNAL_URL.replace(/\/$/, ''));
+}
 
 if (isProduction) {
   // Required on Render/behind proxy for secure cookies to work correctly
