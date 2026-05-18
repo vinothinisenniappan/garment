@@ -500,7 +500,7 @@ export default function SampleInquiry() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 500 }}>
                 <input type="checkbox" required style={{ width: '20px', height: '20px', accentColor: 'var(--primary)' }} checked={formData.agreements.acceptSampleCharges} onChange={(e) => handleNestedChange('agreements', 'acceptSampleCharges', e.target.checked)} />
-                I accept the Sample Development Charges (Admin will quote after review).
+                I accept the Sample Development Charges (our team will quote after review).
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 500 }}>
                 <input type="checkbox" required style={{ width: '20px', height: '20px', accentColor: 'var(--primary)' }} checked={formData.agreements.acceptShippingCharges} onChange={(e) => handleNestedChange('agreements', 'acceptShippingCharges', e.target.checked)} />

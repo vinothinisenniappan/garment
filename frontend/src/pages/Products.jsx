@@ -81,7 +81,7 @@ export default function Products() {
                   Production Catalog
                 </h1>
                 <p style={{ maxWidth: '720px', margin: 0, color: '#4a5568', fontSize: '1rem', lineHeight: '1.7' }}>
-                  Factory-ready garments arranged as a buyer-first collection with cleaner filtering, faster scanning, and live inventory-backed updates from the admin panel.
+                  Factory-ready garments with clean filtering, fast scanning, and live inventory updates for registered buyers.
                 </p>
               </div>
 

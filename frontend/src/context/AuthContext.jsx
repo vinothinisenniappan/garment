@@ -3,44 +3,29 @@ import { apiFetch } from '../lib/api'
 
 const AuthContext = createContext({
   user: null,
-  admin: null,
   loading: true,
-  login: () => { },
-  adminLogin: () => { },
-  logout: () => { },
-  register: () => { }
+  login: () => {},
+  logout: () => {},
+  register: () => {}
 })
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [admin, setAdmin] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const checkAuth = async () => {
-    try {
-      // Check user session
-      const userData = await apiFetch('/api/user/profile')
-      if (userData.success) {
-        setUser(userData.user)
-      }
-    } catch (err) {
-      // Not logged in as user or error
-    }
-
-    try {
-      // Check admin session (if applicable)
-      const adminData = await apiFetch('/api/admin/check-auth')
-      if (adminData.success && adminData.authenticated) {
-        setAdmin(adminData.admin)
-      }
-    } catch (err) {
-      // Not logged in as admin or error
-    }
-
-    setLoading(false)
-  }
-
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const userData = await apiFetch('/api/user/profile')
+        if (userData.success) {
+          setUser(userData.user)
+        }
+      } catch {
+        setUser(null)
+      } finally {
+        setLoading(false)
+      }
+    }
     checkAuth()
   }, [])
 
@@ -68,30 +53,13 @@ export function AuthProvider({ children }) {
     return data
   }
 
-  const adminLogin = async (username, password) => {
-    const data = await apiFetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    })
-    if (data.success) {
-      setAdmin(data.admin)
-    }
-    return data
-  }
-
-  const logout = async (type = 'user') => {
-    if (type === 'admin') {
-      await apiFetch('/api/admin/logout')
-      setAdmin(null)
-    } else {
-      await apiFetch('/api/user/logout', { method: 'POST' })
-      setUser(null)
-    }
+  const logout = async () => {
+    await apiFetch('/api/user/logout', { method: 'POST' })
+    setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, admin, loading, login, adminLogin, logout, register }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   )

@@ -73,7 +73,7 @@ export default function BuyerProfile() {
         items.push({
           id: `${inquiry._id}-response`,
           date: new Date(inquiry.adminRespondedAt || inquiry.updatedAt || inquiry.createdAt),
-          title: 'Admin Update',
+          title: 'Company Update',
           description: inquiry.adminNotes || `Status updated to ${inquiry.status}`,
           status: inquiry.status,
           inquiry
@@ -94,7 +94,7 @@ export default function BuyerProfile() {
         <div className="internal-hero__inner">
           <span className="section-subtitle">Buyer Workspace</span>
           <h1 className="internal-hero__title">My Profile & Inquiry Updates</h1>
-          <p>Track all inquiry activity, admin responses, and status updates in one place.</p>
+          <p>Track all inquiry activity, company responses, and status updates in one place.</p>
         </div>
       </section>
 
@@ -146,7 +146,7 @@ export default function BuyerProfile() {
 
                   {inquiry.adminNotes && (
                     <div className="buyer-admin-reply">
-                      <strong>Admin Response</strong>
+                      <strong>Company Response</strong>
                       <p>{inquiry.adminNotes}</p>
                       <span>{new Date(inquiry.adminRespondedAt || inquiry.updatedAt).toLocaleString()}</span>
                     </div>
